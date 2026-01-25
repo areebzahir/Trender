@@ -32,25 +32,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "warm",
         label: "Warm & Earthy",
-        image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/782484ea-826f-4a16-a594-f61989d759dd.png",
         description: "Terracotta, sage, cream tones"
       },
       {
         id: "cool",
         label: "Cool & Calm",
-        image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/3b4c1d68-4f5a-4c4a-a5b6-ce4b84271c82.png",
         description: "Blues, grays, whites"
       },
       {
         id: "bold",
         label: "Bold & Vibrant",
-        image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/da769313-b8cb-4ace-8564-4aaf8255ee14.png",
         description: "Rich jewel tones"
       },
       {
         id: "neutral",
         label: "Neutral & Minimal",
-        image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/245d2203-5707-42b8-b7e8-69c7ec4eb939.png",
         description: "Beiges, whites, naturals"
       }
     ]
