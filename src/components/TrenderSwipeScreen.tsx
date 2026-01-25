@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
-import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box } from 'lucide-react';
+import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box, Star, Truck, Shield, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useWishlistStore, WishlistItem } from './WishlistStore';
@@ -212,7 +212,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
       {/* Horizontal Card Carousel Container */}
       <div className="flex items-center justify-center min-h-screen px-4 pt-20 pb-32">
-        <div className="relative w-full max-w-sm mx-auto">
+        <div className="relative w-full max-w-md mx-auto">
 
           {/* Background Cards Stack (T-Layout) */}
           {cards.slice(1, 3).map((item, index) => (
@@ -223,7 +223,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
               animate={{ scale: 0.9 - (index * 0.05), y: 8 + (index * 8), opacity: 0.6 - (index * 0.2) }}
               style={{ zIndex: 10 - index }}
             >
-              <div className="w-full h-[520px] bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg" />
+              <div className="w-full h-[650px] bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg" />
             </motion.div>
           ))}
 
@@ -240,10 +240,10 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
             whileTap={{ scale: 0.98 }}
           >
             {/* Neumorphic Card */}
-            <div className="w-full h-[520px] bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-[8px_8px_24px_rgba(0,0,0,0.1),-8px_-8px_24px_rgba(255,255,255,0.9)] border border-white/20 overflow-hidden">
+            <div className="w-full h-[650px] bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-[8px_8px_24px_rgba(0,0,0,0.1),-8px_-8px_24px_rgba(255,255,255,0.9)] border border-white/20 overflow-hidden">
 
               {/* Hero Image with Overlays */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 <motion.img
                   src={currentItem.images[selectedColorIndex] || currentItem.images[0]}
                   alt={currentItem.name}
@@ -292,7 +292,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
               </div>
 
               {/* Card Content */}
-              <div className="p-6 space-y-4 h-64 flex flex-col">
+              <div className="p-6 space-y-4 h-80 flex flex-col">
 
                 {/* Product Info */}
                 <div className="flex-1">
@@ -422,67 +422,184 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-end"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-center justify-end"
           onClick={() => setShowDetails(false)}
         >
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="w-full bg-white rounded-t-3xl max-h-[70vh] overflow-y-auto shadow-2xl"
+            className="w-1/2 h-full bg-white shadow-2xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 space-y-6">
 
-              {/* Header with drag handle */}
-              <div className="text-center">
-                <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900">{currentItem.name}</h3>
-                <p className="text-orange-600">Premium Collection</p>
+              {/* Header with Breadcrumbs */}
+              <div className="relative border-b border-gray-200 pb-4">
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <nav className="text-sm text-gray-500 mb-2">
+                  Home / Furniture / {currentItem.category} / {currentItem.name}
+                </nav>
+                <h3 className="text-2xl font-bold text-gray-900 leading-tight">{currentItem.name}</h3>
+                <p className="text-orange-600 font-medium">Premium Collection</p>
+
+                {/* Benefit Highlights */}
+                <div className="flex gap-2 mt-3">
+                  <Badge variant="secondary" className="text-xs">Pet-friendly</Badge>
+                  <Badge variant="secondary" className="text-xs">Easy assembly</Badge>
+                  <Badge variant="secondary" className="text-xs">Free shipping</Badge>
+                </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="flex gap-3">
-                <Button
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
-                  onClick={() => window.open(currentItem.buyLink, '_blank')}
-                >
-                  <ShoppingBag className="w-4 h-4 mr-2" />
-                  View Store
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
-                  onClick={() => {
-                    // Add AR functionality here
-                    console.log('AR View activated');
-                  }}
-                >
-                  <Box className="w-4 h-4 mr-2" />
-                  AR View
-                </Button>
-              </div>
+              {/* Enhanced Gallery */}
+              <div className="space-y-4">
+                <div className="relative">
+                  <motion.img
+                    src={currentItem.images[selectedColorIndex] || currentItem.images[0]}
+                    alt={currentItem.name}
+                    className="w-full h-48 object-cover rounded-xl shadow-lg"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                  <div className="absolute top-2 right-2">
+                    <Badge className="bg-green-500 text-white">In Stock</Badge>
+                  </div>
+                </div>
 
-              {/* Image Gallery */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-800">Gallery</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {currentItem.images.slice(0, 4).map((image, index) => (
-                    <motion.img
+                {/* Thumbnail Gallery */}
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {currentItem.images.map((image, index) => (
+                    <motion.button
                       key={index}
-                      src={image}
-                      alt={`${currentItem.name} view ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-xl shadow-sm"
+                      onClick={() => setSelectedColorIndex(index)}
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${selectedColorIndex === index ? 'border-orange-500' : 'border-gray-200'
+                        }`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                    />
+                    >
+                      <img
+                        src={image}
+                        alt={`${currentItem.name} view ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.button>
                   ))}
                 </div>
               </div>
 
-              {/* Specifications */}
+              {/* Price & Promotions */}
               <div className="space-y-3">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-bold text-gray-900">${currentItem.price}</span>
+                  <span className="text-lg text-gray-500 line-through">$1,299</span>
+                  <Badge className="bg-red-500 text-white">Save $200</Badge>
+                </div>
+                <p className="text-sm text-gray-600">Free shipping • 30-day returns</p>
+              </div>
+
+              {/* Color/Material Variants */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Available Colors</h4>
+                <div className="flex gap-3">
+                  {getAvailableColors().map((color, index) => (
+                    <motion.button
+                      key={index}
+                      className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 ${selectedColorIndex === index ? 'border-orange-500 bg-orange-50' : 'border-gray-200'
+                        }`}
+                      onClick={() => setSelectedColorIndex(index)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+                        style={{ backgroundColor: color.value }}
+                      />
+                      <span className="text-xs text-gray-700">{color.name}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reviews & Ratings */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-600">4.8 (127 reviews)</span>
+                </div>
+                <p className="text-sm text-gray-600">"Perfect fit for our living room. Quality is exceptional!" - Sarah M.</p>
+              </div>
+
+              {/* Strong CTAs */}
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-4 text-lg font-semibold"
+                  onClick={() => window.open(currentItem.buyLink, '_blank')}
+                >
+                  <ShoppingBag className="w-5 h-5 mr-2" />
+                  Add to Cart - ${currentItem.price}
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
+                    onClick={() => {
+                      console.log('AR View activated');
+                    }}
+                  >
+                    <Box className="w-4 h-4 mr-2" />
+                    View in AR
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      const wishlistItem: WishlistItem = {
+                        id: currentItem.id,
+                        image: currentItem.images[0],
+                        title: currentItem.name,
+                        brand: 'Premium Collection',
+                        price: currentItem.price,
+                        tags: currentItem.style,
+                        link: currentItem.buyLink,
+                        category: currentItem.category
+                      };
+                      addToWishlist(wishlistItem);
+                    }}
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
+                </div>
+              </div>
+
+              {/* Payment Options */}
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Secure checkout with:</p>
+                <div className="flex gap-2">
+                  <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                    <span className="text-xs font-bold">AP</span>
+                  </div>
+                  <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                    <span className="text-xs font-bold">GP</span>
+                  </div>
+                  <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                    <span className="text-xs font-bold">PP</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detailed Specifications */}
+              <div className="space-y-4">
                 <h4 className="font-semibold text-gray-800">Specifications</h4>
                 <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
                   <div className="flex justify-between">
@@ -501,6 +618,56 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                     <span className="text-gray-600">Category</span>
                     <span className="font-medium text-gray-800">{currentItem.category}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Dimensions</span>
+                    <span className="font-medium text-gray-800">72" W x 35" D x 31" H</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Weight Capacity</span>
+                    <span className="font-medium text-gray-800">500 lbs</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Assembly</span>
+                    <span className="font-medium text-gray-800">Required (tools included)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping & Returns */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Shipping & Returns</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-green-600" />
+                    <span>Free shipping on orders over $500</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-600" />
+                    <span>30-day return policy</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-orange-600" />
+                    <span>Delivery in 3-5 business days</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ Section */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Frequently Asked Questions</h4>
+                <div className="space-y-2 text-sm">
+                  <details className="group">
+                    <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
+                      How long does assembly take?
+                    </summary>
+                    <p className="mt-2 text-gray-600">Assembly typically takes 30-45 minutes with the included tools and instructions.</p>
+                  </details>
+                  <details className="group">
+                    <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
+                      Is this pet-friendly?
+                    </summary>
+                    <p className="mt-2 text-gray-600">Yes, this fabric is stain-resistant and perfect for homes with pets.</p>
+                  </details>
                 </div>
               </div>
             </div>
