@@ -119,6 +119,9 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
     addToWishlist(wishlistItem);
 
+    // Show success feedback
+    console.log(`Added "${currentItem.name}" to wishlist!`);
+
     // Animate card out to the right
     controls.start({
       x: 400,
