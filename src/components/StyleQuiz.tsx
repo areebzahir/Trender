@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import orangeChairModernWall from "@/assets/orange-chair-modern-wall.jpg";
+import pinkChairMinimal from "@/assets/pink-chair-minimal.jpg";
 
 interface QuizOption {
   id: string;
@@ -182,99 +184,134 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Button variant="ghost" onClick={handlePrevious}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {currentQuestion === 0 ? 'Back' : 'Previous'}
-          </Button>
-          <div className="text-center">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <h1 className="text-xl font-bold text-foreground">Style Discovery</h1>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
+      {/* Background Images */}
+      <div className="absolute inset-0">
+        <div 
+          className="absolute top-0 left-0 w-1/3 h-full bg-cover bg-center opacity-8"
+          style={{ backgroundImage: `url(${orangeChairModernWall})` }}
+        />
+        <div 
+          className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center opacity-8"
+          style={{ backgroundImage: `url(${pinkChairMinimal})` }}
+        />
+      </div>
+
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-40 right-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/20 rounded-full blur-2xl"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <Button 
+          variant="ghost" 
+          onClick={handlePrevious}
+          className="mb-8 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {currentQuestion === 0 ? 'Back' : 'Previous'}
+        </Button>
+
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8 animate-fade-in">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 mb-6">
+              <div className="flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-primary mr-3 animate-pulse" />
+                <h1 className="text-5xl font-bold text-foreground drop-shadow-lg">Discover Your Style</h1>
+                <Sparkles className="w-8 h-8 text-primary ml-3 animate-pulse" />
+              </div>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Answer a few questions to help us understand your design preferences
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Question {currentQuestion + 1} of {quizQuestions.length}
-            </p>
           </div>
-          <div className="w-16" /> {/* Spacer */}
-        </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-muted rounded-full h-2 mb-8">
-          <div 
-            className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
-          />
-        </div>
-
-        {/* Question */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            {question.question}
-          </h2>
-          <p className="text-muted-foreground">
-            Choose the option that best represents your style preference
-          </p>
-        </div>
-
-        {/* Options */}
-        <div className="grid md:grid-cols-2 gap-4 mb-8">
-          {question.options.map((option) => (
-            <Card 
-              key={option.id}
-              className={`cursor-pointer transition-all duration-200 overflow-hidden hover:shadow-warm ${
-                selectedOption === option.id 
-                  ? 'ring-2 ring-primary border-primary shadow-warm' 
-                  : 'hover:border-primary/50'
-              }`}
-              onClick={() => handleOptionSelect(option.id)}
-            >
-              <div className="aspect-video overflow-hidden">
-                <img 
-                  src={option.image} 
-                  alt={option.label}
-                  className="w-full h-full object-cover transition-transform hover:scale-105"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-foreground">{option.label}</h3>
-                  {selectedOption === option.id && (
-                    <Badge variant="default">Selected</Badge>
-                  )}
+          <Card className="border-2 border-primary/20 bg-card/80 backdrop-blur-md shadow-2xl animate-fade-in">
+            <div className="p-8">
+              {/* Progress */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-muted-foreground">Question {currentQuestion + 1} of {quizQuestions.length}</span>
+                  <span className="text-sm text-muted-foreground">{Math.round(((currentQuestion + 1) / quizQuestions.length) * 100)}%</span>
                 </div>
-                {option.description && (
-                  <p className="text-sm text-muted-foreground">{option.description}</p>
-                )}
+                <div className="w-full bg-background/50 rounded-full h-3">
+                  <div 
+                    className="bg-gradient-primary h-3 rounded-full transition-all duration-300 shadow-soft"
+                    style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
+                  />
+                </div>
               </div>
-            </Card>
-          ))}
-        </div>
 
-        {/* Navigation */}
-        <div className="flex justify-center">
-          <Button 
-            onClick={handleNext}
-            disabled={!canProceed}
-            variant="hero"
-            size="lg"
-            className="min-w-32"
-          >
-            {isLastQuestion ? (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Get Results
-              </>
-            ) : (
-              <>
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </>
-            )}
-          </Button>
+              {/* Question */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-foreground mb-4">
+                  {question.question}
+                </h2>
+                <p className="text-muted-foreground">
+                  Choose the option that best represents your style preference
+                </p>
+              </div>
+
+              {/* Options */}
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {question.options.map((option) => (
+                  <Card 
+                    key={option.id}
+                    className={`cursor-pointer transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-warm overflow-hidden ${
+                      selectedOption === option.id 
+                        ? 'border-primary bg-primary/10 shadow-lg ring-2 ring-primary/50' 
+                        : 'border-border/50 hover:border-primary/50 hover:bg-accent/5'
+                    }`}
+                    onClick={() => handleOptionSelect(option.id)}
+                  >
+                    <div className="aspect-video overflow-hidden">
+                      <img 
+                        src={option.image} 
+                        alt={option.label}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-foreground">{option.label}</h3>
+                        {selectedOption === option.id && (
+                          <Badge variant="default" className="shadow-soft">Selected</Badge>
+                        )}
+                      </div>
+                      {option.description && (
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleNext}
+                  disabled={!canProceed}
+                  variant="hero"
+                  size="lg"
+                  className="min-w-32 disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  {isLastQuestion ? (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Get Results
+                    </>
+                  ) : (
+                    <>
+                      Next
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ interface ChoicePageProps {
 
 export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePageProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden flex flex-col">
       {/* Decorative background elements */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
@@ -20,35 +20,35 @@ export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePage
         <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/20 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto px-4 py-6 relative z-10 flex flex-col h-full">
         <Button 
           variant="ghost" 
           onClick={onBack}
-          className="mb-8 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
+          className="mb-4 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 self-start"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
 
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <Sparkles className="w-8 h-8 text-primary mr-3 animate-pulse" />
-              <h1 className="text-5xl font-bold text-foreground drop-shadow-lg">
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 max-w-3xl mx-auto">
+            <div className="flex items-center justify-center mb-3">
+              <Sparkles className="w-6 h-6 text-primary mr-2 animate-pulse" />
+              <h1 className="text-4xl font-bold text-foreground drop-shadow-lg">
                 Choose Your Journey
               </h1>
-              <Sparkles className="w-8 h-8 text-primary ml-3 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-primary ml-2 animate-pulse" />
             </div>
-            <p className="text-xl text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Discover your perfect furniture match through personalized experiences designed just for you
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto flex-1">
           {/* Room Decorating Option */}
           <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in">
-            <div className="aspect-[3/4] relative">
+            <div className="aspect-[4/5] relative">
               {/* Background Image */}
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
@@ -86,7 +86,7 @@ export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePage
 
           {/* Style Quiz Option */}
           <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="aspect-[3/4] relative">
+            <div className="aspect-[4/5] relative">
               {/* Background Image */}
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
@@ -123,12 +123,12 @@ export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePage
           </Card>
         </div>
 
-        <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 max-w-2xl mx-auto">
-            <p className="text-muted-foreground mb-2 text-lg">
+        <div className="text-center mt-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 max-w-2xl mx-auto">
+            <p className="text-muted-foreground mb-1 text-base">
               ✨ Both paths lead to personalized furniture recommendations
             </p>
-            <p className="text-sm text-muted-foreground/80">
+            <p className="text-xs text-muted-foreground/80">
               Powered by advanced AI • Curated by design experts • Tailored just for you
             </p>
           </div>
