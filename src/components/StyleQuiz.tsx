@@ -185,127 +185,149 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
-      {/* Background Images */}
+      {/* Enhanced Background Images */}
       <div className="absolute inset-0">
         <div 
-          className="absolute top-0 left-0 w-1/3 h-full bg-cover bg-center opacity-8"
+          className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${orangeChairModernWall})` }}
         />
         <div 
-          className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center opacity-8"
+          className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${pinkChairMinimal})` }}
         />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
       </div>
 
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-40 right-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/20 rounded-full blur-2xl"></div>
+      {/* Floating decorative elements */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-r from-primary/30 to-accent/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-40 right-20 w-60 h-60 bg-gradient-to-r from-accent/20 to-primary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-gradient-to-r from-secondary/30 to-primary/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto px-4 py-6 relative z-10">
         <Button 
           variant="ghost" 
           onClick={handlePrevious}
-          className="mb-8 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
+          className="mb-6 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 bg-white/10 backdrop-blur-sm border border-white/20"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           {currentQuestion === 0 ? 'Back' : 'Previous'}
         </Button>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
+          {/* Enhanced Header */}
           <div className="text-center mb-8 animate-fade-in">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-primary mr-3 animate-pulse" />
-                <h1 className="text-5xl font-bold text-foreground drop-shadow-lg">Discover Your Style</h1>
-                <Sparkles className="w-8 h-8 text-primary ml-3 animate-pulse" />
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 mb-6 shadow-2xl">
+              <div className="flex items-center justify-center mb-6">
+                <div className="bg-gradient-primary rounded-full p-3 mr-4 shadow-warm">
+                  <Sparkles className="w-8 h-8 text-white animate-pulse" />
+                </div>
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-lg font-display">
+                  Discover Your Style
+                </h1>
+                <div className="bg-gradient-primary rounded-full p-3 ml-4 shadow-warm">
+                  <Sparkles className="w-8 h-8 text-white animate-pulse" />
+                </div>
               </div>
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                Answer a few questions to help us understand your design preferences
+              <p className="text-xl text-muted-foreground leading-relaxed font-body">
+                Answer a few questions to help us understand your unique design preferences
               </p>
             </div>
           </div>
 
-          <Card className="border-2 border-primary/20 bg-card/80 backdrop-blur-md shadow-2xl animate-fade-in">
-            <div className="p-8">
-              {/* Progress */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-muted-foreground">Question {currentQuestion + 1} of {quizQuestions.length}</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(((currentQuestion + 1) / quizQuestions.length) * 100)}%</span>
+          {/* Enhanced Card */}
+          <Card className="border-2 border-primary/30 bg-white/20 backdrop-blur-xl shadow-2xl animate-fade-in rounded-3xl overflow-hidden">
+            <div className="p-10">
+              {/* Enhanced Progress */}
+              <div className="mb-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-semibold text-foreground">Question {currentQuestion + 1} of {quizQuestions.length}</span>
+                  <span className="text-lg font-semibold text-primary">{Math.round(((currentQuestion + 1) / quizQuestions.length) * 100)}%</span>
                 </div>
-                <div className="w-full bg-background/50 rounded-full h-3">
+                <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden shadow-inner">
                   <div 
-                    className="bg-gradient-primary h-3 rounded-full transition-all duration-300 shadow-soft"
+                    className="bg-gradient-primary h-4 rounded-full transition-all duration-700 shadow-warm relative"
                     style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
-                  />
+                  >
+                    <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
               </div>
 
-              {/* Question */}
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-foreground mb-4">
+              {/* Enhanced Question */}
+              <div className="text-center mb-10">
+                <h2 className="text-4xl font-bold text-foreground mb-6 font-display leading-tight">
                   {question.question}
                 </h2>
-                <p className="text-muted-foreground">
+                <p className="text-lg text-muted-foreground font-body">
                   Choose the option that best represents your style preference
                 </p>
               </div>
 
-              {/* Options */}
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                {question.options.map((option) => (
+              {/* Enhanced Options Grid */}
+              <div className="grid md:grid-cols-2 gap-8 mb-10">
+                {question.options.map((option, index) => (
                   <Card 
                     key={option.id}
-                    className={`cursor-pointer transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-warm overflow-hidden ${
+                    className={`cursor-pointer transition-all duration-500 hover:scale-105 overflow-hidden rounded-2xl ${
                       selectedOption === option.id 
-                        ? 'border-primary bg-primary/10 shadow-lg ring-2 ring-primary/50' 
-                        : 'border-border/50 hover:border-primary/50 hover:bg-accent/5'
+                        ? 'border-2 border-primary bg-primary/10 shadow-2xl ring-4 ring-primary/30 scale-105' 
+                        : 'border border-border/50 hover:border-primary/50 hover:bg-accent/10 shadow-lg hover:shadow-warm'
                     }`}
                     onClick={() => handleOptionSelect(option.id)}
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className="aspect-video overflow-hidden">
+                    <div className="aspect-[4/3] overflow-hidden relative">
                       <img 
                         src={option.image} 
                         alt={option.label}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                        className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                       />
+                      {selectedOption === option.id && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-primary/20 flex items-center justify-center">
+                          <div className="bg-white rounded-full p-3 shadow-warm">
+                            <Sparkles className="w-8 h-8 text-primary" />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground">{option.label}</h3>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-xl font-semibold text-foreground font-display">{option.label}</h3>
                         {selectedOption === option.id && (
-                          <Badge variant="default" className="shadow-soft">Selected</Badge>
+                          <Badge className="bg-gradient-primary text-white shadow-soft animate-pulse">Selected</Badge>
                         )}
                       </div>
                       {option.description && (
-                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                        <p className="text-base text-muted-foreground font-body leading-relaxed">{option.description}</p>
                       )}
                     </div>
                   </Card>
                 ))}
               </div>
 
-              {/* Navigation */}
+              {/* Enhanced Navigation */}
               <div className="flex justify-center">
                 <Button 
                   onClick={handleNext}
                   disabled={!canProceed}
                   variant="hero"
                   size="lg"
-                  className="min-w-32 disabled:opacity-50 disabled:hover:scale-100"
+                  className={`min-w-48 h-14 text-lg font-semibold transition-all duration-300 ${
+                    !canProceed ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+                  }`}
                 >
                   {isLastQuestion ? (
                     <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Get Results
+                      <Sparkles className="w-5 h-5 mr-3" />
+                      Get My Results
+                      <Sparkles className="w-5 h-5 ml-3" />
                     </>
                   ) : (
                     <>
-                      Next
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      Continue Journey
+                      <ArrowRight className="w-5 h-5 ml-3" />
                     </>
                   )}
                 </Button>
