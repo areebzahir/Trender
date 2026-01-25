@@ -33,7 +33,7 @@ class GPTService {
           reasoning: `Your attraction to this ${furnitureName.toLowerCase()} reveals your appreciation for pieces that balance form and function. The design language speaks to your ${tasteProfile.styles?.[0] || 'modern'} sensibilities while offering the comfort you value.`,
           styleMatch: `${tasteProfile.styles?.[0] || 'Contemporary'} • Functional Beauty`,
           personalizedNote: `This piece would seamlessly integrate into your evolving aesthetic, adding both visual interest and practical value to your space.`
-        }
+        },
         {
           reasoning: `The ${furnitureName.toLowerCase()} embodies the ${tasteProfile.aesthetics?.[0] || 'contemporary'} vibe you're cultivating. Its ${tasteProfile.materials?.[0] || 'natural'} materials and thoughtful design speak to your refined taste.`,
           styleMatch: `${tasteProfile.materials?.[0] || 'Wood'} & ${tasteProfile.colors?.[0] || 'Warm'} Tones`,

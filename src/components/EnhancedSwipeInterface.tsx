@@ -65,24 +65,35 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
     const initializeData = async () => {
       setIsLoading(true);
       try {
+        console.log('🚀 Initializing Trender with Qloo API...');
+        
+        // Analyze taste profile first
         const profile = await qlooService.analyzeTasteProfile(
           roomData.preferences, 
           roomData.image || undefined
         );
+        console.log('✅ Taste profile analyzed:', profile);
         setTasteProfile(profile);
 
         // Fetch recommendations after taste profile is analyzed
         const fetchedRecommendations = await qlooService.getFurnitureRecommendations(profile);
+        console.log('✅ Recommendations fetched:', fetchedRecommendations.length, 'items');
         setRecommendations(fetchedRecommendations);
+
+        if (fetchedRecommendations.length === 0) {
+          console.warn('⚠️ No recommendations received, this might indicate an API issue');
+          toast({
+            title: "Limited Recommendations",
+            description: "We're having trouble loading all recommendations. Some items may be from our curated collection.",
+          });
+        }
       } catch (error) {
         console.error('Error initializing data:', error);
         toast({
           title: "Initialization Error",
-          description: "Failed to load data. Using default recommendations.",
+          description: "We're having trouble connecting to our recommendation service. Using curated selections.",
           variant: "destructive"
         });
-        // Fallback to sampleFurniture if API fails
-        // setRecommendations(sampleFurniture as unknown as QlooRecommendation[]); // Removed fallback
       } finally {
         setIsLoading(false);
       }
@@ -208,8 +219,13 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
           <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto animate-pulse">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-foreground">Analyzing Your Taste</h2>
-          <p className="text-muted-foreground">Creating your personalized furniture recommendations...</p>
+          <h2 className="text-xl font-semibold text-foreground">Analyzing Your Style</h2>
+          <p className="text-muted-foreground">Our AI is creating personalized furniture recommendations just for you...</p>
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          </div>
         </div>
       </div>
     );
