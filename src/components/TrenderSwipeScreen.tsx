@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
-import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box, Star, Truck, Shield, Clock } from 'lucide-react';
+import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box, Star, Truck, Shield, Clock, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useWishlistStore, WishlistItem } from './WishlistStore';
@@ -24,6 +24,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   const [showDetails, setShowDetails] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [showMatchReason, setShowMatchReason] = useState(false);
+  const [showExpandedImage, setShowExpandedImage] = useState(false);
   const [cards, setCards] = useState(sampleFurniture.slice(0, 3));
   const { add: addToWishlist } = useWishlistStore();
 
@@ -282,12 +283,22 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
                 {/* AR View Button */}
                 <motion.button
-                  className="absolute bottom-4 right-4 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-black/50 transition-colors"
+                  className="absolute bottom-4 right-12 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-black/50 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setShowDetails(!showDetails)}
                 >
                   <Box className="w-4 h-4" />
+                </motion.button>
+
+                {/* Expand Image Button */}
+                <motion.button
+                  className="absolute bottom-4 right-4 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-black/50 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowExpandedImage(true)}
+                >
+                  <Maximize2 className="w-4 h-4" />
                 </motion.button>
               </div>
 
@@ -672,10 +683,69 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
               </div>
             </div>
           </motion.div>
-        </motion.div>
-      )}
-    </div>
-  );
-};
+                 </motion.div>
+       )}
+
+       {/* Expanded Image Modal */}
+       {showExpandedImage && (
+         <motion.div
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+           onClick={() => setShowExpandedImage(false)}
+         >
+           <motion.div
+             initial={{ scale: 0.8, opacity: 0 }}
+             animate={{ scale: 1, opacity: 1 }}
+             exit={{ scale: 0.8, opacity: 0 }}
+             transition={{ type: "spring", damping: 25, stiffness: 200 }}
+             className="relative max-w-4xl max-h-full"
+             onClick={(e) => e.stopPropagation()}
+           >
+             {/* Close Button */}
+             <button
+               onClick={() => setShowExpandedImage(false)}
+               className="absolute top-4 right-4 z-10 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
+             >
+               <X className="w-5 h-5" />
+             </button>
+
+             {/* Expanded Image */}
+             <motion.img
+               src={currentItem.images[selectedColorIndex] || currentItem.images[0]}
+               alt={currentItem.name}
+               className="w-full h-auto max-h-[90vh] object-contain rounded-lg shadow-2xl"
+               initial={{ scale: 0.9 }}
+               animate={{ scale: 1 }}
+               transition={{ duration: 0.3 }}
+             />
+
+             {/* Image Navigation */}
+             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+               {currentItem.images.map((image, index) => (
+                 <motion.button
+                   key={index}
+                   onClick={() => setSelectedColorIndex(index)}
+                   className={`w-3 h-3 rounded-full border-2 ${
+                     selectedColorIndex === index ? 'bg-white border-white' : 'bg-white/30 border-white/50'
+                   }`}
+                   whileHover={{ scale: 1.2 }}
+                   whileTap={{ scale: 0.9 }}
+                 />
+               ))}
+             </div>
+
+             {/* Product Info Overlay */}
+             <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white">
+               <h3 className="font-semibold text-sm">{currentItem.name}</h3>
+               <p className="text-xs opacity-80">${currentItem.price}</p>
+             </div>
+           </motion.div>
+         </motion.div>
+       )}
+     </div>
+   );
+ };
 
 export default TrenderSwipeScreen;
