@@ -32,25 +32,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "warm",
         label: "Warm & Earthy",
-        image: "/style-images/245d2203-5707-42b8-b7e8-69c7ec4eb939.png",
+        image: "/lovable-uploads/782484ea-826f-4a16-a594-f61989d759dd.png",
         description: "Terracotta, sage, cream tones"
       },
       {
         id: "cool",
         label: "Cool & Calm",
-        image: "/style-images/3b4c1d68-4f5a-4c4a-a5b6-ce4b84271c82.png",
+        image: "/lovable-uploads/3b4c1d68-4f5a-4c4a-a5b6-ce4b84271c82.png",
         description: "Blues, grays, whites"
       },
       {
         id: "bold",
         label: "Bold & Vibrant",
-        image: "/style-images/da769313-b8cb-4ace-8564-4aaf8255ee14.png",
+        image: "/lovable-uploads/da769313-b8cb-4ace-8564-4aaf8255ee14.png",
         description: "Rich jewel tones"
       },
       {
         id: "neutral",
         label: "Neutral & Minimal",
-        image: "/style-images/782484ea-826f-4a16-a594-f61989d759dd.png",
+        image: "/lovable-uploads/245d2203-5707-42b8-b7e8-69c7ec4eb939.png",
         description: "Beiges, whites, naturals"
       }
     ]
@@ -187,19 +187,11 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
       {/* Enhanced Background Images */}
       <div className="absolute inset-0">
-<<<<<<< HEAD
         <div 
           className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${orangeChairModernWall})` }}
         />
         <div 
-=======
-        <div
-          className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-10"
-          style={{ backgroundImage: `url(${orangeChairModernWall})` }}
-        />
-        <div
->>>>>>> master
           className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${pinkChairMinimal})` }}
         />
@@ -214,13 +206,8 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10">
-<<<<<<< HEAD
         <Button 
           variant="ghost" 
-=======
-        <Button
-          variant="ghost"
->>>>>>> master
           onClick={handlePrevious}
           className="mb-6 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 bg-white/10 backdrop-blur-sm border border-white/20"
         >
@@ -259,11 +246,7 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
                   <span className="text-lg font-semibold text-primary">{Math.round(((currentQuestion + 1) / quizQuestions.length) * 100)}%</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden shadow-inner">
-<<<<<<< HEAD
                   <div 
-=======
-                  <div
->>>>>>> master
                     className="bg-gradient-primary h-4 rounded-full transition-all duration-700 shadow-warm relative"
                     style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
                   >
@@ -285,7 +268,6 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
               {/* Enhanced Options Grid */}
               <div className="grid md:grid-cols-2 gap-8 mb-10">
                 {question.options.map((option, index) => (
-<<<<<<< HEAD
                   <Card 
                     key={option.id}
                     className={`cursor-pointer transition-all duration-500 hover:scale-105 overflow-hidden rounded-2xl ${
@@ -293,25 +275,12 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
                         ? 'border-2 border-primary bg-primary/10 shadow-2xl ring-4 ring-primary/30 scale-105' 
                         : 'border border-border/50 hover:border-primary/50 hover:bg-accent/10 shadow-lg hover:shadow-warm'
                     }`}
-=======
-                  <Card
-                    key={option.id}
-                    className={`cursor-pointer transition-all duration-500 hover:scale-105 overflow-hidden rounded-2xl ${selectedOption === option.id
-                      ? 'border-2 border-primary bg-primary/10 shadow-2xl ring-4 ring-primary/30 scale-105'
-                      : 'border border-border/50 hover:border-primary/50 hover:bg-accent/10 shadow-lg hover:shadow-warm'
-                      }`}
->>>>>>> master
                     onClick={() => handleOptionSelect(option.id)}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="aspect-[4/3] overflow-hidden relative">
-<<<<<<< HEAD
                       <img 
                         src={option.image} 
-=======
-                      <img
-                        src={option.image}
->>>>>>> master
                         alt={option.label}
                         className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                       />
@@ -340,23 +309,14 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
 
               {/* Enhanced Navigation */}
               <div className="flex justify-center">
-<<<<<<< HEAD
                 <Button 
-=======
-                <Button
->>>>>>> master
                   onClick={handleNext}
                   disabled={!canProceed}
                   variant="hero"
                   size="lg"
-<<<<<<< HEAD
                   className={`min-w-48 h-14 text-lg font-semibold transition-all duration-300 ${
                     !canProceed ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
                   }`}
-=======
-                  className={`min-w-48 h-14 text-lg font-semibold transition-all duration-300 ${!canProceed ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
-                    }`}
->>>>>>> master
                 >
                   {isLastQuestion ? (
                     <>
