@@ -179,7 +179,7 @@ export const StyleResults = ({ results, onBack, onContinue, onUploadRoom }: Styl
   return (
     <div className="min-h-screen bg-background relative">
       {/* Themed Fluid Blob Background */}
-      <ThemedFluidBlob />
+              <ThemedFluidBlob />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-orange-50/80 to-amber-50/80 backdrop-blur-sm">

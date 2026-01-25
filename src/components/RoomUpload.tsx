@@ -40,6 +40,7 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
+  // Location detection logic (fix and polish)
   const handleDetectLocation = async () => {
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by your browser.");
@@ -58,17 +59,18 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
           const data = await response.json();
           // Compose a nice address string
           const address = data.display_name ||
-            [data.address.road, data.address.city, data.address.state, data.address.country]
+            [data.address.city, data.address.state, data.address.country]
               .filter(Boolean).join(", ");
+          if (!address) throw new Error("No address found");
           setLocation(address);
         } catch (err) {
-          setLocationError("Could not determine address from location.");
+          setLocationError("Could not determine address from location. Please enter your city or address manually.");
         } finally {
           setIsLocating(false);
         }
       },
       (error) => {
-        setLocationError("Unable to retrieve your location.");
+        setLocationError("Unable to retrieve your location. Please enter your city or address manually.");
         setIsLocating(false);
       }
     );
@@ -286,13 +288,13 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                 {/* Location Field + Detect Button (new feature, keep) */}
                 <div className="flex gap-2 items-center mb-7">
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"><Target className="w-5 h-5" /></span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C24E40]"><Target className="w-5 h-5" /></span>
                     <Input
                       type="text"
                       value={location}
                       onChange={e => setLocation(e.target.value)}
                       placeholder="Enter your city, zip, or address (optional)"
-                      className="pl-12 pr-4 py-3 rounded-xl border border-primary/20 bg-white/60 focus:ring-2 focus:ring-primary/30 transition-all text-base flex-1"
+                      className="pl-12 pr-4 py-3 rounded-xl border border-[#C24E40]/20 bg-white/60 focus:ring-2 focus:ring-[#C24E40]/30 transition-all text-base flex-1"
                       maxLength={100}
                     />
                   </div>
@@ -302,12 +304,14 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                     size="sm"
                     onClick={handleDetectLocation}
                     disabled={isLocating}
-                    className="transition-all"
+                    className="transition-all border-[#C24E40] text-[#C24E40] hover:bg-[#F4E3E1] hover:text-[#A63A2B] flex items-center gap-2"
                   >
-                    {isLocating ? 'Locating...' : 'Detect'}
+                    {isLocating ? (<span className="animate-spin w-4 h-4 border-2 border-[#C24E40] border-t-transparent rounded-full"></span>) : 'Detect'}
                   </Button>
                 </div>
-                {locationError && <div className="text-xs text-destructive mt-1 mb-2">{locationError}</div>}
+                {locationError && (
+                  <div className="text-[#C24E40] text-xs mt-1 font-semibold bg-[#F9E6E1] rounded px-3 py-2 shadow-sm">{locationError}</div>
+                )}
 
                 {/* Continue Button (improved CTA, keep) */}
                 <div className="flex justify-center mt-2">

@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -124,7 +124,7 @@ function ThemedFluidBlobShader() {
   }), []);
 
   // Update resolution when size changes
-  React.useEffect(() => {
+  useEffect(() => {
     const { width, height } = size;
     const imageAspect = 1;
     let a1, a2;

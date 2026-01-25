@@ -1,765 +1,523 @@
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Heart, 
-  X, 
-  Star, 
-  Palette, 
-  Ruler, 
-  ExternalLink,
-  ArrowLeft,
-  Sparkles,
-  Eye,
-  Info,
-  MapPin,
-  ShoppingCart,
-  Zap
-} from "lucide-react";
-import { ImageCarousel } from "./ImageCarousel";
-import { ColorPalette } from "./ColorPalette";
-import { ProductDetailModal } from "./ProductDetailModal";
-import { type FurnitureItem } from "@/data/sampleFurniture";
-import { useToast } from "@/hooks/use-toast";
-import { TasteProfileDashboard } from "./TasteProfileDashboard";
-import { qlooService, QlooTasteProfile, QlooRecommendation } from "@/services/qlooApi";
-import { gptService, GPTExplanation, RoomVisualization } from "@/services/gptService";
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Filter, SortAsc, Package, TrendingUp, Heart, ShoppingCart, MapPin, ExternalLink, ChevronDown, LayoutGrid, List, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { qlooService, QlooRecommendation } from '@/services/qlooApi';
+
+interface RoomData {
+  image: File | null;
+  preferences: string;
+  specific?: string;
+  quizResults?: Record<string, string>;
+}
 
 interface EnhancedSwipeInterfaceProps {
   onBack: () => void;
-  roomData: { image: File | null; preferences: string; specific?: string };
-}
-
-interface SwipeHistoryItem {
-  item: QlooRecommendation; // Changed from FurnitureItem
-  liked: boolean;
-  timestamp: Date;
-  explanation?: GPTExplanation;
+  roomData: RoomData;
 }
 
 export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterfaceProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [recommendations, setRecommendations] = useState<QlooRecommendation[]>([]); // New state for QLOO recommendations
-  const [matches, setMatches] = useState<QlooRecommendation[]>([]); // Changed from FurnitureItem
-  const [swipeHistory, setSwipeHistory] = useState<SwipeHistoryItem[]>([]);
-  const [showMatches, setShowMatches] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [showVisualization, setShowVisualization] = useState(false);
-  const [showProductDetail, setShowProductDetail] = useState(false);
-  const [tasteProfile, setTasteProfile] = useState<QlooTasteProfile | null>(null);
-  const [currentExplanation, setCurrentExplanation] = useState<GPTExplanation | null>(null);
-  const [currentVisualization, setCurrentVisualization] = useState<RoomVisualization | null>(null);
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  const [matches, setMatches] = useState<QlooRecommendation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('relevance');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const currentItem = recommendations[currentIndex]; // Use recommendations instead of sampleFurniture
-
-  // Initialize taste profile and fetch recommendations
   useEffect(() => {
-    const initializeData = async () => {
-      setIsLoading(true);
+    const fetchMatches = async () => {
       try {
-        console.log('🚀 Initializing Trender with Qloo API...');
-        
-        // Analyze taste profile first
-        const profile = await qlooService.analyzeTasteProfile(
-          roomData.preferences, 
-          roomData.image || undefined
-        );
-        console.log('✅ Taste profile analyzed:', profile);
-        setTasteProfile(profile);
-
-        // Fetch recommendations after taste profile is analyzed
-        const fetchedRecommendations = await qlooService.getFurnitureRecommendations(profile);
-        console.log('✅ Recommendations fetched:', fetchedRecommendations.length, 'items');
-        setRecommendations(fetchedRecommendations);
-
-        if (fetchedRecommendations.length === 0) {
-          console.warn('⚠️ No recommendations received, this might indicate an API issue');
-          toast({
-            title: "Limited Recommendations",
-            description: "We're having trouble loading all recommendations. Some items may be from our curated collection.",
-          });
-        }
+        setLoading(true);
+        // Create a basic taste profile for modern/minimalist furniture
+        const basicTasteProfile = {
+          styles: ['modern', 'minimalist', 'contemporary'],
+          colors: ['neutral', 'white', 'gray', 'black'],
+          materials: ['wood', 'metal', 'glass'],
+          brands: [],
+          aesthetics: ['clean', 'simple', 'elegant'],
+          culturalReferences: []
+        };
+        const recommendations = await qlooService.getFurnitureRecommendations(basicTasteProfile);
+        setMatches(recommendations);
       } catch (error) {
-        console.error('Error initializing data:', error);
-        toast({
-          title: "Initialization Error",
-          description: "We're having trouble connecting to our recommendation service. Using curated selections.",
-          variant: "destructive"
-        });
+        console.error('Error fetching recommendations:', error);
+        // Fallback to empty array if API fails
+        setMatches([]);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    initializeData();
-  }, [roomData]);
+    fetchMatches();
+  }, []);
 
-  const handleSwipe = async (direction: 'left' | 'right') => {
-    if (!currentItem || !tasteProfile) return;
+  const filteredMatches = matches.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.brand.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || 
+                           item.category?.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
 
-    setSwipeDirection(direction);
-    
-    const liked = direction === 'right';
-    const historyItem: SwipeHistoryItem = {
-      item: currentItem,
-      liked,
-      timestamp: new Date()
-    };
-
-    if (liked) {
-      setMatches(prev => [...prev, currentItem]);
-      
-      // Generate explanation for liked items
-      try {
-        const explanation = await gptService.generateFurnitureExplanation(
-          currentItem.name,
-          roomData.preferences,
-          tasteProfile
-        );
-        historyItem.explanation = explanation;
-      } catch (error) {
-        console.error('Error generating explanation:', error);
-      }
-
-      toast({
-        title: "✨ It's a match!",
-        description: `${currentItem.name} added to your favorites`,
-      });
+  const sortedMatches = [...filteredMatches].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'name':
+        return a.name.localeCompare(b.name);
+      default:
+        return 0;
     }
+  });
 
-    setSwipeHistory(prev => [...prev, historyItem]);
+  const categories = [
+    { value: 'all', label: 'All Categories', icon: Package },
+    { value: 'seating', label: 'Seating', icon: Package },
+    { value: 'tables', label: 'Tables', icon: Package },
+    { value: 'storage', label: 'Storage', icon: Package },
+    { value: 'lighting', label: 'Lighting', icon: Package },
+    { value: 'decor', label: 'Decor', icon: Package }
+  ];
 
-    setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-      setSwipeDirection(null);
-    }, 300);
-  };
+  const sortOptions = [
+    { value: 'relevance', label: 'Best Match', icon: TrendingUp },
+    { value: 'price-low', label: 'Price: Low to High', icon: SortAsc },
+    { value: 'price-high', label: 'Price: High to Low', icon: SortAsc },
+    { value: 'name', label: 'Name A-Z', icon: SortAsc }
+  ];
 
-  const handleShowExplanation = async () => {
-    if (!currentItem || !tasteProfile) return;
-
-    try {
-      const explanation = await gptService.generateFurnitureExplanation(
-        currentItem.name,
-        roomData.preferences,
-        tasteProfile
-      );
-      setCurrentExplanation(explanation);
-      setShowExplanation(true);
-    } catch (error) {
-      console.error('Error generating explanation:', error);
-      toast({
-        title: "Error",
-        description: "Could not generate explanation",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleShowVisualization = async () => {
-    if (!currentItem) return;
-
-    try {
-      const visualization = await gptService.generateRoomVisualization(
-        currentItem.name,
-        "your uploaded room",
-        roomData.preferences
-      );
-      setCurrentVisualization(visualization);
-      setShowVisualization(true);
-    } catch (error) {
-      console.error('Error generating visualization:', error);
-      toast({
-        title: "Error",
-        description: "Could not generate room visualization",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    const startX = e.clientX;
-    const startY = e.clientY;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      setDragOffset({ x: deltaX, y: deltaY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      
-      if (Math.abs(dragOffset.x) > 100) {
-        handleSwipe(dragOffset.x > 0 ? 'right' : 'left');
-      }
-      setDragOffset({ x: 0, y: 0 });
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto animate-pulse">
-            <Sparkles className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-xl font-semibold text-foreground">Analyzing Your Style</h2>
-          <p className="text-muted-foreground">Our AI is creating personalized furniture recommendations just for you...</p>
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          </div>
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Premium Loading Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F7F4F0] via-[#EDE7DD] to-[#DCD8CF]">
+          {/* Ambient Light Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-[#FCE2D4]/20 to-transparent rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-radial from-[#EEE6DA]/15 to-transparent rounded-full blur-2xl animate-pulse delay-1000" />
+        </div>
+        
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="w-12 h-12 border-4 border-[#F76A1C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[#2D1B00] font-medium">Curating your perfect matches...</p>
+          </motion.div>
         </div>
       </div>
     );
   }
 
-  // Show taste profile dashboard
-  if (showProfile && tasteProfile) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="flex items-center justify-between mb-6">
-            <Button variant="ghost" onClick={() => setShowProfile(false)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Swiping
-            </Button>
-            <h1 className="text-2xl font-bold text-foreground">Your Style DNA</h1>
-            <div></div>
-          </div>
-          
-          <TasteProfileDashboard
-            tasteProfile={tasteProfile}
-            swipeCount={swipeHistory.length}
-            matchCount={matches.length}
-            onExploreAlternate={() => {
-              toast({
-                title: "Coming Soon!",
-                description: "Alternative aesthetic exploration is in development",
-              });
-            }}
-          />
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Premium Showroom Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#F7F4F0] via-[#EDE7DD] to-[#DCD8CF]">
+        {/* Ambient Light Orbs - Floating Gently */}
+        <motion.div
+          className="absolute top-1/6 left-1/5 w-96 h-96 bg-gradient-radial from-[#FCE2D4]/12 to-transparent rounded-full blur-3xl"
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        <motion.div
+          className="absolute top-2/3 right-1/6 w-80 h-80 bg-gradient-radial from-[#EEE6DA]/10 to-transparent rounded-full blur-2xl"
+          animate={{
+            x: [0, -25, 0],
+            y: [0, 15, 0],
+            scale: [1, 0.9, 1]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-gradient-radial from-[#BFB9AE]/8 to-transparent rounded-full blur-2xl"
+          animate={{
+            x: [0, 20, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 4
+          }}
+        />
+
+        {/* Subtle Geometric Floating Elements */}
+        <motion.div
+          className="absolute top-1/4 right-1/3 w-32 h-32 border border-[#BFB9AE]/20 rounded-full"
+          animate={{
+            rotate: [0, 360],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/3 left-1/6 w-24 h-24 bg-[#DCD8CF]/30 rounded-lg rotate-45"
+          animate={{
+            rotate: [45, 405],
+            y: [0, -20, 0]
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Furniture Silhouette Patterns - Very Subtle */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="w-full h-full" viewBox="0 0 1200 800" fill="none">
+            {/* Abstract Chair Curves */}
+            <motion.path
+              d="M200 400 Q250 300 300 400 Q350 500 400 400"
+              stroke="#2D1B00"
+              strokeWidth="2"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            />
+            
+            {/* Abstract Lamp Arcs */}
+            <motion.circle
+              cx="800"
+              cy="200"
+              r="60"
+              stroke="#2D1B00"
+              strokeWidth="1"
+              fill="none"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            />
+            
+            {/* Abstract Table Lines */}
+            <motion.rect
+              x="600"
+              y="600"
+              width="120"
+              height="20"
+              fill="#2D1B00"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </svg>
         </div>
+
+        {/* Subtle Texture Overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
+          style={{
+            backgroundImage: `radial-gradient(circle at 20% 50%, #DCD8CF 2px, transparent 2px),
+                             radial-gradient(circle at 80% 50%, #BFB9AE 1px, transparent 1px)`,
+            backgroundSize: '60px 60px, 40px 40px'
+          }}
+        />
       </div>
-    );
-  }
 
-  // Show explanation modal
-  if (showExplanation && currentExplanation) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <Button variant="ghost" onClick={() => setShowExplanation(false)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <h1 className="text-xl font-bold text-foreground">Why This Matches</h1>
-            <div></div>
+      {/* Main Content - Now with proper z-index layering */}
+      <div className="relative z-10">
+        {/* Top Filter Bar */}
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-[#DCD8CF]/40 shadow-lg">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            {/* Back Button Row */}
+            <div className="mb-4">
+              <Button 
+                variant="ghost" 
+                onClick={onBack}
+                className="text-[#A5846E] hover:text-[#2D1B00] hover:bg-[#F4E3E1]/50 transition-all duration-200 rounded-xl"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
+              {/* Category Filter - Left */}
+              <div className="flex items-center space-x-3">
+                <Package className="w-5 h-5 text-[#A5846E]" />
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full lg:w-48 bg-white/90 border-[#DCD8CF]/60 hover:bg-white transition-all duration-200 rounded-xl shadow-sm">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-lg border-[#DCD8CF]/60">
+                    {categories.map((category) => (
+                      <SelectItem key={category.value} value={category.value} className="hover:bg-[#F4E3E1]/50">
+                        <div className="flex items-center space-x-2">
+                          <category.icon className="w-4 h-4" />
+                          <span>{category.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Filter - Center Left */}
+              <div className="flex items-center justify-center space-x-3">
+                <TrendingUp className="w-5 h-5 text-[#A5846E]" />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full lg:w-48 bg-white/90 border-[#DCD8CF]/60 hover:bg-white transition-all duration-200 rounded-xl shadow-sm">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-lg border-[#DCD8CF]/60">
+                    {sortOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value} className="hover:bg-[#F4E3E1]/50">
+                        <div className="flex items-center space-x-2">
+                          <option.icon className="w-4 h-4" />
+                          <span>{option.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Layout Toggle - Center Right */}
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-sm text-[#A5846E] font-medium">Layout:</span>
+                <div className="flex bg-white/90 border border-[#DCD8CF]/60 rounded-xl p-1 shadow-sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className={`rounded-lg px-3 py-2 transition-all duration-200 ${
+                      viewMode === 'grid'
+                        ? 'bg-[#F76A1C] text-white shadow-sm'
+                        : 'text-[#A5846E] hover:bg-[#F4E3E1]/50'
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className={`rounded-lg px-3 py-2 transition-all duration-200 ${
+                      viewMode === 'list'
+                        ? 'bg-[#F76A1C] text-white shadow-sm'
+                        : 'text-[#A5846E] hover:bg-[#F4E3E1]/50'
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Search Bar - Right */}
+              <div className="flex items-center justify-end space-x-3">
+                <div className="relative w-full lg:w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#A5846E]" />
+                  <Input
+                    type="text"
+                    placeholder="Search furniture..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 bg-white/90 border-[#DCD8CF]/60 hover:bg-white focus:bg-white transition-all duration-200 rounded-xl placeholder:text-[#A5846E]/70 shadow-sm"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <Zap className="w-6 h-6 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">{currentItem?.name}</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-foreground mb-2">AI Reasoning</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {currentExplanation.reasoning}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Style Match</h3>
-                <Badge variant="secondary">{currentExplanation.styleMatch}</Badge>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Personal Note</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {currentExplanation.personalizedNote}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button 
-                onClick={() => handleSwipe('right')}
-                className="flex-1"
-                variant="hero"
-              >
-                <Heart className="w-4 h-4 mr-2" />
-                Add to Matches
-              </Button>
-              <Button 
-                onClick={() => handleSwipe('left')}
-                variant="outline"
-                className="flex-1"
-              >
-                <X className="w-4 h-4 mr-2" />
-                Pass
-              </Button>
-            </div>
-          </Card>
         </div>
-      </div>
-    );
-  }
 
-  // Show room visualization
-  if (showVisualization && currentVisualization) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <Button variant="ghost" onClick={() => setShowVisualization(false)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <h1 className="text-xl font-bold text-foreground">Room Visualization</h1>
-            <div></div>
-          </div>
+        {/* Visual Separator */}
+        <div className="h-px bg-gradient-to-r from-transparent via-[#DCD8CF]/40 to-transparent mx-6"></div>
 
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <Eye className="w-6 h-6 text-accent" />
-              <h2 className="text-lg font-semibold text-foreground">{currentItem?.name} in Your Space</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Visualization</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {currentVisualization.description}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Placement Suggestions</h3>
-                <ul className="space-y-1">
-                  {currentVisualization.placementSuggestions.map((suggestion, index) => (
-                    <li key={index} className="text-muted-foreground text-sm flex items-start gap-2">
-                      <span className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Color Harmony</h3>
-                <p className="text-muted-foreground text-sm">
-                  {currentVisualization.colorHarmony}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Style Integration</h3>
-                <p className="text-muted-foreground text-sm">
-                  {currentVisualization.styleIntegration}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button 
-                onClick={() => handleSwipe('right')}
-                className="flex-1"
-                variant="hero"
+        {/* Main Content Area */}
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          {/* Premium Title Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center relative"
+          >
+            {/* Subtle Background Glow for Title */}
+            <div className="absolute inset-0 bg-gradient-radial from-[#FCE2D4]/10 to-transparent blur-2xl -z-10" />
+            
+            <div className="relative inline-block">
+              <motion.h1 
+                className="text-4xl lg:text-5xl font-bold text-[#2D1B00] mb-4 tracking-tight"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <Heart className="w-4 h-4 mr-2" />
-                Love It!
-              </Button>
-              <Button 
-                onClick={() => handleSwipe('left')}
-                variant="outline"
-                className="flex-1"
-              >
-                <X className="w-4 h-4 mr-2" />
-                Not For Me
-              </Button>
+                Curated Picks for You
+              </motion.h1>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#F76A1C] to-[#F8A87B] rounded-full shadow-lg"
+              />
             </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+            <div className="flex items-center justify-center space-x-2 mt-6">
+              <Badge variant="secondary" className="bg-white/80 text-[#A5846E] border-[#DCD8CF]/60 px-4 py-1 shadow-sm backdrop-blur-sm">
+                {sortedMatches.length} perfectly matched items
+              </Badge>
+              <Badge variant="outline" className="border-[#DCD8CF]/60 text-[#A5846E] px-3 py-1 bg-white/60 backdrop-blur-sm">
+                {viewMode === 'grid' ? 'Grid View' : 'List View'}
+              </Badge>
+            </div>
+          </motion.div>
 
-  // End of furniture items
-  if (currentIndex >= recommendations.length) { // Use recommendations.length
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-md mx-auto p-8 text-center bg-gradient-card">
-          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Style Journey Complete!
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            You've explored all available furniture. Your taste profile is now fully developed!
-          </p>
-          <div className="space-y-3">
-            <Button 
-              onClick={() => setShowMatches(true)} 
-              className="w-full" 
-              variant="hero"
+          {/* Cards Grid/List */}
+          {sortedMatches.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20 relative"
             >
-              View My Matches ({matches.length})
-            </Button>
-            <Button 
-              onClick={() => setShowProfile(true)} 
-              variant="outline" 
-              className="w-full"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              View Style Profile
-            </Button>
-            <Button 
-              onClick={() => setCurrentIndex(0)} 
-              variant="outline" 
-              className="w-full"
-            >
-              Start Over
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show matches
-  if (showMatches) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="flex items-center justify-between mb-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => setShowMatches(false)}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Swiping
-            </Button>
-            <h1 className="text-2xl font-bold text-foreground">
-              Your Matches ({matches.length})
-            </h1>
-            <div></div>
-          </div>
-
-          {matches.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">No matches yet</h2>
-              <p className="text-muted-foreground mb-4">Start swiping to find furniture you love!</p>
-              <Button onClick={() => setShowMatches(false)} variant="hero">
-                Start Swiping
-              </Button>
-            </Card>
+              <div className="absolute inset-0 bg-gradient-radial from-[#FCE2D4]/5 to-transparent blur-2xl" />
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-white/80 border border-[#DCD8CF]/60 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg backdrop-blur-sm">
+                  <Search className="w-8 h-8 text-[#A5846E]" />
+                </div>
+                <h3 className="text-2xl font-semibold text-[#2D1B00] mb-2">No matches found</h3>
+                <p className="text-[#A5846E] max-w-md mx-auto">
+                  Try adjusting your filters or search terms to discover more beautiful furniture pieces.
+                </p>
+              </div>
+            </motion.div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {matches.map((item) => (
-                <Card key={item.id} className="overflow-hidden hover:shadow-warm transition-shadow">
-                  <div className="aspect-square overflow-hidden">
-                    <ImageCarousel 
-                      images={item.images} 
-                      alt={item.name}
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground mb-1">{item.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-2">{item.brand}</p>
-                    <p className="text-lg font-bold text-primary mb-3">${item.price}</p>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        className="flex-1" 
-                        variant="outline"
-                        onClick={() => window.open(item.buyLink, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Shop Now
-                      </Button>
-                      {item.storeLocations && item.storeLocations.length > 0 && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            // Handle displaying store locations, e.g., in a modal or new page
-                            toast({
-                              title: "Store Locations",
-                              description: `Opening map for stores near ${item.name}`,
-                            });
-                            // For now, let's just log the first store location
-                            console.log("Store Location:", item.storeLocations[0]);
-                            // TODO: Implement actual map integration or detailed store list display
-                          }}
-                        >
-                          <MapPin className="w-4 h-4" />
-                        </Button>
-                      )}
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => {
-                          toast({
-                            title: "Added to Cart!",
-                            description: `${item.name} is ready for purchase`,
-                          });
-                        }}
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                      </Button>
+            <div className={viewMode === 'grid' 
+              ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8' 
+              : 'flex flex-col gap-6'
+            }>
+              {sortedMatches.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group"
+                  whileHover={{ y: -8 }}
+                >
+                  <Card className={`h-full bg-white/85 backdrop-blur-md border-[#DCD8CF]/40 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 ${
+                    viewMode === 'list' ? 'flex flex-row items-center' : ''
+                  }`}>
+                    {/* Image Container */}
+                    <div className={`relative overflow-hidden ${
+                      viewMode === 'list' ? 'w-48 h-32 flex-shrink-0' : 'h-64'
+                    }`}>
+                      <img
+                        src={item.images?.[0] || '/placeholder.svg'}
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                  </div>
-                </Card>
+
+                    {/* Content */}
+                    <div className={`space-y-4 ${viewMode === 'list' ? 'p-6 flex-1' : 'p-6'}`}>
+                      {/* Brand & Category */}
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="border-[#DCD8CF]/60 text-[#A5846E] bg-white/60 backdrop-blur-sm">
+                          {item.brand}
+                        </Badge>
+                        {item.category && (
+                          <span className="text-xs text-[#A5846E] uppercase tracking-wide">
+                            {item.category}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Title */}
+                      <h3 className={`font-bold text-[#2D1B00] leading-tight group-hover:text-[#F76A1C] transition-colors duration-300 ${
+                        viewMode === 'list' ? 'text-lg' : 'text-xl'
+                      }`}>
+                        {item.name}
+                      </h3>
+
+                      {/* Price */}
+                      <div className="flex items-center justify-between">
+                        <span className={`font-bold text-[#F76A1C] drop-shadow-sm ${
+                          viewMode === 'list' ? 'text-xl' : 'text-2xl'
+                        }`}>
+                          ${item.price?.toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Tags */}
+                      {item.style && item.style.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {item.style.slice(0, viewMode === 'list' ? 2 : 3).map((tag, tagIndex) => (
+                            <Badge
+                              key={tagIndex}
+                              variant="secondary"
+                              className="bg-[#F4E3E1]/60 text-[#A5846E] text-xs px-2 py-1 rounded-full border-0 backdrop-blur-sm"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className={`flex items-center pt-4 ${
+                        viewMode === 'list' ? 'space-x-2' : 'space-x-3'
+                      }`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 border-[#DCD8CF]/60 text-[#A5846E] hover:bg-[#F4E3E1]/50 rounded-xl transition-all duration-200 bg-white/60 backdrop-blur-sm"
+                        >
+                          <Heart className="w-4 h-4 mr-2" />
+                          Save
+                        </Button>
+                        
+                        <Button
+                          className="flex-1 bg-gradient-to-r from-[#F76A1C] to-[#F8A87B] hover:from-[#F8A87B] hover:to-[#F76A1C] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          onClick={() => window.open(item.buyLink, '_blank')}
+                        >
+                          <span>Shop Now</span>
+                          <motion.div
+                            className="ml-2"
+                            whileHover={{ x: 4 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </motion.div>
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           )}
         </div>
       </div>
-    );
-  }
-
-  if (!currentItem || !tasteProfile) return null;
-
-  return (
-    <div className="min-h-screen bg-background p-4">
-      {/* Header */}
-      <div className="container mx-auto max-w-lg">
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" onClick={onBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              {currentIndex + 1} of {recommendations.length} {/* Use recommendations.length */}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowProfile(true)}
-            >
-              <Sparkles className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowMatches(true)}
-              className="relative"
-            >
-              <Heart className="w-4 h-4 mr-2" />
-              {matches.length > 0 && (
-                <Badge className="absolute -top-2 -right-2 px-1 min-w-[1.25rem] h-5">
-                  {matches.length}
-                </Badge>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* Swipe Card */}
-        <div className="relative h-[600px] mb-6">
-          <Card 
-            ref={cardRef}
-            className={`absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing bg-card shadow-warm transition-all duration-300 ${
-              swipeDirection === 'left' ? 'animate-swipe-left' : 
-              swipeDirection === 'right' ? 'animate-swipe-right' : ''
-            }`}
-            style={{
-              transform: `translate(${dragOffset.x}px, ${dragOffset.y}px) rotate(${dragOffset.x * 0.1}deg)`,
-            }}
-            onMouseDown={handleMouseDown}
-          >
-            {/* Image Carousel */}
-            <div className="relative h-2/3 overflow-hidden">
-              <ImageCarousel 
-                images={currentItem.images} 
-                alt={currentItem.name}
-                className="w-full h-full"
-              />
-              <div className="absolute top-4 right-4">
-                <Badge variant="secondary" className="bg-card/80 backdrop-blur-sm">
-                  {currentItem.category}
-                </Badge>
-              </div>
-              <div className="absolute top-4 left-4 flex gap-2">
-                <Button
-                  size="sm"
-                  variant="swipe"
-                  onClick={handleShowExplanation}
-                >
-                  <Info className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="swipe"
-                  onClick={() => setShowProductDetail(true)}
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 space-y-4">
-              <div>
-                <h2 className="text-xl font-bold text-foreground">{currentItem.name}</h2>
-                <p className="text-muted-foreground">{currentItem.brand}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-2xl font-bold text-primary">${currentItem.price}</p>
-                  {currentItem.originalPrice && (
-                    <p className="text-lg text-muted-foreground line-through">${currentItem.originalPrice}</p>
-                  )}
-                </div>
-              </div>
-
-              {currentItem.reasoning && (
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-                  <div className="flex items-start gap-2">
-                    <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-foreground">{currentItem.reasoning}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  {currentItem.rating && (
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-current text-accent" />
-                      {currentItem.rating} ({currentItem.reviewCount})
-                    </div>
-                  )}
-                  {currentItem.dimensions && (
-                    <div className="flex items-center gap-1">
-                      <Ruler className="w-4 h-4" />
-                      {currentItem.dimensions.width} W
-                    </div>
-                  )}
-                  {currentItem.colorOptions && currentItem.colorOptions.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Palette className="w-4 h-4" />
-                      {currentItem.colorOptions.length} colors
-                    </div>
-                  )}
-                </div>
-
-                {currentItem.colorOptions && currentItem.colorOptions.length > 0 && (
-                  <ColorPalette 
-                    colors={currentItem.colorOptions}
-                    showImages={false}
-                  />
-                )}
-                
-                {currentItem.buyLink && (
-                  <Button 
-                    className="w-full"
-                    onClick={() => window.open(currentItem.buyLink, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Buy Now
-                  </Button>
-                )}
-                
-                {currentItem.storeLocations && currentItem.storeLocations.length > 0 && (
-                  <Button 
-                    className="w-full"
-                    variant="outline"
-                    onClick={() => {
-                      toast({
-                        title: "Store Locations",
-                        description: `Finding stores near you for ${currentItem.name}`,
-                      });
-                      // TODO: Integrate with a map service or display a list of stores
-                      console.log("Store Locations:", currentItem.storeLocations);
-                    }}
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    Find in Stores
-                  </Button>
-                )}
-
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-4 mb-4">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe('left')}
-            className="w-16 h-16 rounded-full p-0 hover:bg-destructive/10 hover:border-destructive/50"
-          >
-            <X className="w-6 h-6 text-destructive" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleShowVisualization}
-            className="w-16 h-16 rounded-full p-0 hover:bg-accent/10 hover:border-accent/50"
-          >
-            <Eye className="w-6 h-6 text-accent" />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe('right')}
-            className="w-16 h-16 rounded-full p-0 hover:bg-primary/10 hover:border-primary/50"
-          >
-            <Heart className="w-6 h-6 text-primary" />
-          </Button>
-        </div>
-
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
-            ❌ Pass • 👁️ Visualize • ❤️ Match
-          </p>
-        </div>
-      </div>
-
-      {/* Product Detail Modal */}
-      {showProductDetail && (
-        <ProductDetailModal
-          item={currentItem}
-          onClose={() => setShowProductDetail(false)}
-          onLike={() => handleSwipe('right')}
-          onBuy={() => {
-            toast({
-              title: "Redirecting to Store",
-              description: `Taking you to purchase ${currentItem.name}`,
-            });
-            window.open(currentItem.buyLink, '_blank');
-          }}
-        />
-      )}
     </div>
   );
 };

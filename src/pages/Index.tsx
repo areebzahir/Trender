@@ -25,7 +25,7 @@ const Index = () => {
 
   const handleRoomUpload = (data: RoomData) => {
     setRoomData(data);
-    setCurrentState('quiz');
+    setCurrentState('swipe');
   };
 
   const handleQuizComplete = (results: Record<string, string>) => {
