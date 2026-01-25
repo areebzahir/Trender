@@ -11,11 +11,8 @@ export function RobotScene() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const furnitureImages = [
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80',
-    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80',
-    'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80',
-    'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80',
-    'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80'
+    '/lovable-uploads/ChatGPT Image Jul 31, 2025, 03_42_19 PM.png',
+    '/lovable-uploads/Modern Minimalistic Living Room in Orange Tones.png'
   ];
 
   const handleImageClick = () => {
@@ -53,9 +50,10 @@ export function RobotScene() {
             transition={{ duration: 0.2 }}
           >
             <motion.div
-              className="w-full h-full bg-cover bg-center"
+              className="w-full h-full bg-cover"
               style={{
-                backgroundImage: `url('${furnitureImages[currentImageIndex]}')`
+                backgroundImage: `url('${furnitureImages[currentImageIndex]}')`,
+                backgroundPosition: currentImageIndex === 0 ? 'center 60%' : 'center 30%'
               }}
               key={currentImageIndex}
               initial={{ opacity: 0 }}
@@ -75,7 +73,7 @@ export function RobotScene() {
 
               {/* Image counter */}
               <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
-                <span className="text-xs text-white">{currentImageIndex === 0 ? 'Original' : 'Switched'}</span>
+                <span className="text-xs text-white">{currentImageIndex === 0 ? 'ChatGPT' : 'Modern Living'}</span>
               </div>
             </motion.div>
           </motion.div>
