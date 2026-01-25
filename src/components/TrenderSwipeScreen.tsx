@@ -266,7 +266,12 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
                 {/* Floating Animated Elements */}
                 <motion.div
-                  className="absolute top-8 left-8 w-3 h-3 bg-yellow-400 rounded-full"
+                  className={`absolute top-8 left-8 w-3 h-3 rounded-full ${currentItem.brand === "goop" ? "bg-blue-400" :
+                    currentItem.brand === "IKEA" ? "bg-yellow-400" :
+                      currentItem.brand === "Studio ANANSI" ? "bg-brown-400" :
+                        currentItem.brand === "Adam Rogers" ? "bg-amber-400" :
+                          "bg-yellow-400"
+                    }`}
                   animate={{
                     scale: [1, 1.2, 1],
                     opacity: [0.7, 1, 0.7]
@@ -278,7 +283,12 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                   }}
                 />
                 <motion.div
-                  className="absolute top-16 right-12 w-2 h-2 bg-orange-400 rounded-full"
+                  className={`absolute top-16 right-12 w-2 h-2 rounded-full ${currentItem.brand === "goop" ? "bg-purple-400" :
+                    currentItem.brand === "IKEA" ? "bg-blue-400" :
+                      currentItem.brand === "Studio ANANSI" ? "bg-amber-400" :
+                        currentItem.brand === "Adam Rogers" ? "bg-brown-400" :
+                          "bg-orange-400"
+                    }`}
                   animate={{
                     scale: [1, 1.5, 1],
                     opacity: [0.5, 1, 0.5]
@@ -291,7 +301,12 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                   }}
                 />
                 <motion.div
-                  className="absolute bottom-20 left-16 w-2.5 h-2.5 bg-amber-400 rounded-full"
+                  className={`absolute bottom-20 left-16 w-2.5 h-2.5 rounded-full ${currentItem.brand === "goop" ? "bg-indigo-400" :
+                    currentItem.brand === "IKEA" ? "bg-green-400" :
+                      currentItem.brand === "Studio ANANSI" ? "bg-orange-400" :
+                        currentItem.brand === "Adam Rogers" ? "bg-amber-400" :
+                          "bg-amber-400"
+                    }`}
                   animate={{
                     scale: [1, 1.3, 1],
                     opacity: [0.6, 1, 0.6]
@@ -356,12 +371,44 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
-                      {/* Lenae Logo */}
+                      {/* Brand Logo */}
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">L</span>
-                        </div>
-                        <span className="text-orange-600 font-bold text-sm">LENAE</span>
+                        {currentItem.brand === "goop" ? (
+                          <>
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">G</span>
+                            </div>
+                            <span className="text-blue-600 font-bold text-sm">GOOP</span>
+                          </>
+                        ) : currentItem.brand === "IKEA" ? (
+                          <>
+                            <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-blue-500 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">I</span>
+                            </div>
+                            <span className="text-blue-600 font-bold text-sm">IKEA</span>
+                          </>
+                        ) : currentItem.brand === "Studio ANANSI" ? (
+                          <>
+                            <div className="w-8 h-8 bg-gradient-to-br from-brown-600 to-amber-800 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">S</span>
+                            </div>
+                            <span className="text-brown-700 font-bold text-sm">STUDIO ANANSI</span>
+                          </>
+                        ) : currentItem.brand === "Adam Rogers" ? (
+                          <>
+                            <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-brown-800 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">A</span>
+                            </div>
+                            <span className="text-amber-700 font-bold text-sm">ADAM ROGERS</span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">L</span>
+                            </div>
+                            <span className="text-orange-600 font-bold text-sm">LENAE</span>
+                          </>
+                        )}
                       </div>
 
                       <h2 className="text-xl font-bold text-gray-900 leading-tight">{currentItem.name}</h2>
@@ -398,28 +445,55 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${currentItem.brand === "goop"
+                        ? "bg-blue-100 text-blue-700"
+                        : currentItem.brand === "IKEA"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : currentItem.brand === "Studio ANANSI"
+                            ? "bg-brown-100 text-brown-700"
+                            : currentItem.brand === "Adam Rogers"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-green-100 text-green-700"
+                        }`}
                     >
                       <TrendingUp className="w-3 h-3" />
-                      Trending
+                      {currentItem.brand === "goop" ? "Celebrity Pick" : currentItem.brand === "IKEA" ? "New Lower Price" : currentItem.brand === "Studio ANANSI" ? "Luxury Design" : currentItem.brand === "Adam Rogers" ? "Vintage Inspired" : "Trending"}
                     </motion.div>
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
-                      className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium"
+                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${currentItem.brand === "goop"
+                        ? "bg-purple-100 text-purple-700"
+                        : currentItem.brand === "IKEA"
+                          ? "bg-blue-100 text-blue-700"
+                          : currentItem.brand === "Studio ANANSI"
+                            ? "bg-amber-100 text-amber-700"
+                            : currentItem.brand === "Adam Rogers"
+                              ? "bg-brown-100 text-brown-700"
+                              : "bg-blue-100 text-blue-700"
+                        }`}
                     >
                       <Award className="w-3 h-3" />
-                      Best Seller
+                      {currentItem.brand === "goop" ? "Gwyneth's Choice" : currentItem.brand === "IKEA" ? "Family Favorite" : currentItem.brand === "Studio ANANSI" ? "Handcrafted" : currentItem.brand === "Adam Rogers" ? "70s Cool" : "Best Seller"}
                     </motion.div>
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 }}
-                      className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium"
+                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${currentItem.brand === "goop"
+                        ? "bg-indigo-100 text-indigo-700"
+                        : currentItem.brand === "IKEA"
+                          ? "bg-green-100 text-green-700"
+                          : currentItem.brand === "Studio ANANSI"
+                            ? "bg-orange-100 text-orange-700"
+                            : currentItem.brand === "Adam Rogers"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-purple-100 text-purple-700"
+                        }`}
                     >
                       <Zap className="w-3 h-3" />
-                      Fast Shipping
+                      {currentItem.brand === "goop" ? "CB2 Exclusive" : currentItem.brand === "IKEA" ? "Easy Assembly" : currentItem.brand === "Studio ANANSI" ? "Full-Grain Leather" : currentItem.brand === "Adam Rogers" ? "Semi-Aniline Leather" : "Fast Shipping"}
                     </motion.div>
                   </div>
 

@@ -65,174 +65,170 @@ export const sampleFurniture: FurnitureItem[] = [
   },
   {
     id: "2",
-    name: "Scandinavian Oak Coffee Table",
-    category: "Tables",
-    brand: "West Elm",
-    price: 699,
-    originalPrice: 899,
+    name: "Gwyneth 68\" Light Blue Velvet Loveseat by goop",
+    category: "Seating",
+    brand: "goop",
+    price: 2362,
+    originalPrice: 3149,
     images: [
-      "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop"
+      "/lovable-uploads/CB2 (1).jpg",
+      "/lovable-uploads/CB2 (2).jpg",
+      "/lovable-uploads/CB2 (3).jpg",
+      "/lovable-uploads/CB2 (4).jpg"
     ],
-    description: "Minimalist coffee table crafted from sustainable oak with geometric legs and a natural finish.",
+    description: "Plush loveseat from goop is \"proof that things don't have to be cold and hard to be chic,\" says Gwyneth Paltrow. \"We're taking the compromise out of the equation with chic furniture that's to be lived in and loved.\" Covered in a smooth velvet fabric in an elegant shade of ice blue, the loveseat feels slightly vintage with a mod silhouette that highlights the high-end upholstery. CB2 exclusive.",
     dimensions: {
-      width: "48\"",
-      height: "16\"",
-      depth: "24\"",
-      weight: "45 lbs"
+      width: "68\"",
+      height: "29\"",
+      depth: "35.5\"",
+      weight: "85 lbs"
     },
     colorOptions: [
-      { name: "Natural Oak", hex: "#D2B48C", image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop" },
-      { name: "Walnut", hex: "#8B4513", image: "https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop" },
-      { name: "White Oak", hex: "#F5F5DC", image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop" }
+      { name: "Light Blue Velvet", hex: "#87CEEB", image: "/lovable-uploads/CB2 (1).jpg" }
     ],
-    style: ["Scandinavian", "Modern", "Minimalist"],
-    materials: ["Solid Oak", "Natural Wood Finish"],
-    careInstructions: ["Dust with soft cloth", "Use coasters for drinks", "Oil finish yearly"],
-    features: ["Sustainable sourcing", "Geometric legs", "Scratch-resistant finish", "Easy assembly"],
-    rating: 4.6,
-    reviewCount: 189,
+    style: ["Modern", "Vintage", "Chic", "Contemporary"],
+    materials: ["Cotton-poly blend velvet", "Engineered wood", "Sinuous wire spring suspension"],
+    careInstructions: ["Blot spills immediately with clean, dry cloth", "Spot clean with water-free stain remover", "Professional upholstery cleaning recommended", "Vacuum with handheld attachment", "Rotate cushion periodically", "Avoid direct sunlight"],
+    features: ["Hand-assembled frame", "Kiln-dried engineered wood", "Hand-pulled sinuous wire spring suspension", "FSC® Certified sustainable wood", "Made in Vietnam", "CB2 exclusive"],
+    rating: 4.7,
+    reviewCount: 1,
     inStock: true,
-    buyLink: "https://westelm.com",
-    whyMatch: "The natural wood and geometric design align with your preference for organic materials and clean aesthetics."
+    buyLink: "https://cb2.com",
+    whyMatch: "The elegant light blue velvet and vintage-mod silhouette perfectly complements your sophisticated taste. This loveseat brings both comfort and chic style to any living space."
   },
   {
     id: "3",
-    name: "Brass Arc Floor Lamp",
-    category: "Lighting",
-    brand: "CB2",
-    price: 399,
-    originalPrice: 499,
+    name: "Curvo 75\" White Performance Fabric Apartment Sofa by goop",
+    category: "Seating",
+    brand: "goop",
+    price: 3899,
+    originalPrice: 3899,
     images: [
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop"
+      "/lovable-uploads/ALB1 (1).jpg",
+      "/lovable-uploads/ALB1 (2).jpg",
+      "/lovable-uploads/ALB1 (3).jpg",
+      "/lovable-uploads/ALB1 (4).jpg"
     ],
-    description: "Elegant brass floor lamp with an adjustable arc design, perfect for reading corners.",
+    description: "A goop classic, now upholstered in our favorite snow white performance fabric. As Gwyneth Paltrow says: \"It's a nod to Italian midcentury designs by way of its fluid lines.\" The undeniably elegant form doesn't sacrifice on comfort, either: enveloped in a softly textured and durable fabric, its soft crescent shape perches on champagne-finish legs for a light, loungey look. Well-scaled for apartment living. CB2 exclusive.",
     dimensions: {
-      width: "20\"",
-      height: "78\"",
-      depth: "20\"",
-      weight: "25 lbs"
+      width: "75\"",
+      height: "31\"",
+      depth: "37.5\"",
+      weight: "120 lbs"
     },
     colorOptions: [
-      { name: "Brass", hex: "#B5A642", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop" },
-      { name: "Black", hex: "#2C2C2C", image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop" },
-      { name: "Chrome", hex: "#C0C0C0", image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop" }
+      { name: "Snow White Performance Fabric", hex: "#FFFFFF", image: "/lovable-uploads/ALB1 (1).jpg" }
     ],
-    style: ["Modern", "Industrial", "Contemporary"],
-    materials: ["Brass", "Fabric Shade", "Marble Base"],
-    careInstructions: ["Dust with soft cloth", "Polish brass monthly", "Keep away from moisture"],
-    features: ["Adjustable height", "Marble base for stability", "Dimmable bulb compatible", "Easy assembly"],
-    rating: 4.7,
-    reviewCount: 156,
+    style: ["Mid-Century Modern", "Italian Design", "Contemporary", "Apartment Living"],
+    materials: ["Poly-cotton performance fabric", "Engineered wood", "Sinuous wire spring suspension", "Stainless steel legs"],
+    careInstructions: ["Blot spills immediately with clean, absorbent cloth", "Spot clean with damp cloth and mild detergent", "Professional upholstery cleaning recommended", "Vacuum with handheld attachment", "Rotate cushion periodically", "Refer to deck label for care information"],
+    features: ["Designed by goop exclusively for CB2", "FSC® Certified sustainable wood", "Hand-pulled sinuous wire spring suspension", "Stainless steel legs with champagne finish", "Performance fabric", "Well-scaled for apartment living"],
+    rating: 4.8,
+    reviewCount: 115,
     inStock: true,
     buyLink: "https://cb2.com",
-    whyMatch: "The warm brass finish complements your color palette, and the arc design adds functional elegance to any room."
+    whyMatch: "The elegant Italian midcentury design with fluid lines perfectly matches your sophisticated taste. The snow white performance fabric and champagne-finish legs create a light, loungey look that's ideal for your living space."
   },
   {
     id: "4",
-    name: "Woven Sage Accent Chair",
+    name: "FINNALA Sofa with chaise lounge, Gunnared beige",
     category: "Seating",
-    brand: "Urban Outfitters",
-    price: 549,
-    originalPrice: 649,
+    brand: "IKEA",
+    price: 1549,
+    originalPrice: 2049,
     images: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop"
+      "/lovable-uploads/ikea (1).avif",
+      "/lovable-uploads/ikea (2).avif",
+      "/lovable-uploads/ikea (3).avif",
+      "/lovable-uploads/ikea (4).avif"
     ],
-    description: "Cozy accent chair in sage green with a woven texture and curved wooden legs.",
+    description: "FINNALA sectional sofa can grow and change with a home and the family. Choose how many seats, the look and function to create a sofa that suits you. A clean design and long-lasting comfort are included.",
     dimensions: {
-      width: "28\"",
-      height: "31\"",
-      depth: "30\"",
-      weight: "35 lbs"
+      width: "322 cm (126 3/4\")",
+      height: "85 cm (33 1/2\")",
+      depth: "98 cm (38 5/8\")",
+      weight: "150 lbs"
     },
     colorOptions: [
-      { name: "Sage Green", hex: "#9CAF88", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop" },
-      { name: "Cream", hex: "#F5F5DC", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop" },
-      { name: "Dusty Rose", hex: "#DCAE96", image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop" },
-      { name: "Charcoal", hex: "#36454F", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=800&fit=crop" }
+      { name: "Gunnared Beige", hex: "#D2B48C", image: "/lovable-uploads/ikea (1).avif" }
     ],
-    style: ["Bohemian", "Modern", "Eclectic"],
-    materials: ["Woven Fabric", "Solid Wood", "Cushioned Seat"],
-    careInstructions: ["Vacuum regularly", "Spot clean stains", "Rotate cushions for even wear"],
-    features: ["Curved wooden legs", "Supportive cushioning", "Breathable fabric", "Compact design"],
-    rating: 4.4,
-    reviewCount: 203,
+    style: ["Scandinavian", "Modular", "Contemporary", "Family-Friendly"],
+    materials: ["Polyester fabric", "Engineered wood", "High-resilience polyurethane foam", "Pocket springs"],
+    careInstructions: ["Vacuum regularly", "Spot clean with mild detergent", "Professional cleaning recommended", "Rotate cushions periodically", "Keep away from direct sunlight"],
+    features: ["Modular design", "Chaise lounge included", "Removable covers", "High-resilience foam cushions", "Pocket spring construction", "Family-friendly design", "Easy assembly"],
+    rating: 4.6,
+    reviewCount: 89,
     inStock: true,
-    buyLink: "https://urbanoutfitters.com",
-    whyMatch: "The soft sage color and organic texture bring the calming, natural vibe you're looking for while adding visual interest."
+    buyLink: "https://ikea.com",
+    whyMatch: "The modular FINNALA design with chaise lounge perfectly suits your family's needs. The clean Scandinavian design and long-lasting comfort make it ideal for your living space."
   },
   {
     id: "5",
-    name: "Geometric Ceramic Vase Set",
-    category: "Decor",
-    brand: "Pottery Barn",
-    price: 129,
-    originalPrice: 159,
+    name: "Rodez 105\" Saddle Leather Sofa",
+    category: "Seating",
+    brand: "Studio ANANSI",
+    price: 15799,
+    originalPrice: 15799,
     images: [
-      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop"
+      "/lovable-uploads/cra1 (1).jpg",
+      "/lovable-uploads/cra1 (2).jpg",
+      "/lovable-uploads/cra1 (3).jpg",
+      "/lovable-uploads/cra1 (4).jpg"
     ],
-    description: "Set of three ceramic vases in varying heights with modern geometric shapes.",
+    description: "Low-slung leather sofa by Studio ANANSI is a modern classic. Featuring a welt trim along the perimeter, the oversized frame is wrapped in Moore & Giles full-grain leather with a delicate ruched detail. Crafted by a third generation tannery, the hand-stained leather upholstery is individually selected for its inherent markings and characteristics for a naturally worn-in aesthetic. CB2 exclusive.",
     dimensions: {
-      width: "6\"-8\"",
-      height: "8\"-14\"",
-      depth: "6\"-8\"",
-      weight: "5-8 lbs each"
-    },
-    colorOptions: [
-      { name: "Cream", hex: "#F5F5DC", image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop" },
-      { name: "Terracotta", hex: "#CD853F", image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop" },
-      { name: "Sage", hex: "#9CAF88", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop" },
-      { name: "Charcoal", hex: "#36454F", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=800&fit=crop" }
-    ],
-    style: ["Modern", "Contemporary", "Minimalist"],
-    materials: ["Ceramic", "Matte Finish"],
-    careInstructions: ["Hand wash only", "Use lukewarm water", "Dry immediately"],
-    features: ["Set of 3 vases", "Geometric design", "Water-tight construction", "Various heights"],
-    rating: 4.5,
-    reviewCount: 92,
-    inStock: true,
-    buyLink: "https://potterybarn.com",
-    whyMatch: "These geometric shapes echo your modern sensibility while the earthy tones tie into your warm color palette perfectly."
-  },
-  {
-    id: "6",
-    name: "Live Edge Walnut Dining Table",
-    category: "Tables",
-    brand: "Crate & Barrel",
-    price: 1299,
-    originalPrice: 1599,
-    images: [
-      "https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop"
-    ],
-    description: "Stunning live edge walnut dining table that celebrates natural wood grain and organic forms.",
-    dimensions: {
-      width: "72\"",
-      height: "30\"",
-      depth: "36\"",
+      width: "105\"",
+      height: "26.5\"",
+      depth: "40\"",
       weight: "180 lbs"
     },
     colorOptions: [
-      { name: "Natural Walnut", hex: "#8B4513", image: "https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop" },
-      { name: "Natural Oak", hex: "#D2B48C", image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop" }
+      { name: "Dakota Leather in Tobacco", hex: "#8B4513", image: "/lovable-uploads/cra1 (1).jpg" }
     ],
-    style: ["Modern", "Rustic Modern", "Organic"],
-    materials: ["Solid Walnut", "Live Edge", "Steel Legs"],
-    careInstructions: ["Oil finish annually", "Use coasters and placemats", "Avoid direct heat"],
-    features: ["Live edge design", "Solid wood construction", "Steel hairpin legs", "Seats 6-8 people"],
+    style: ["Modern Classic", "Leather", "Contemporary", "Luxury"],
+    materials: ["Moore & Giles full-grain aniline leather", "Engineered hardwood frame", "Sinuous wire suspension", "Foam-poly blend cushions"],
+    careInstructions: ["Refer to deck label for care information", "Vacuum and rotate cushion periodically", "Professional leather cleaning recommended", "Vacuum with handheld attachment", "Leather may patina over time", "Avoid direct sunlight"],
+    features: ["Designed by Studio ANANSI", "FSC® Certified sustainable wood", "Moore & Giles full-grain leather", "Sinuous wire suspension", "Removable inset legs", "Hand-stained leather", "Naturally worn-in aesthetic"],
     rating: 4.9,
-    reviewCount: 78,
-    inStock: false,
-    buyLink: "https://crateandbarrel.com",
-    whyMatch: "The natural wood grain and organic edge bring warmth and authenticity that aligns perfectly with your style preferences."
-  }
+    reviewCount: 12,
+    inStock: true,
+    buyLink: "https://cb2.com",
+    whyMatch: "The luxurious Moore & Giles full-grain leather and modern classic design perfectly complements your sophisticated taste. The hand-stained leather with natural markings creates a timeless, worn-in aesthetic."
+  },
+  {
+    id: "6",
+    name: "Serafin 81\" Brown Leather Daybed",
+    category: "Seating",
+    brand: "Adam Rogers",
+    price: 8499,
+    originalPrice: 8499,
+    images: [
+      "/lovable-uploads/fba  (1).jpg",
+      "/lovable-uploads/fba  (2).jpg",
+      "/lovable-uploads/fba  (3).jpg",
+      "/lovable-uploads/fba  (4).jpg"
+    ],
+    description: "Vintage-inspired daybed by Adam Rogers brings the cool parts of the '70s back in a generously scaled silhouette. Luxe, semi-aniline cowhide leather will patina over time, adding to the \"had this forever\" feel, while the wood base sports a mid-tone walnut veneer that lets the vertical grain detail shine through.",
+    dimensions: {
+      width: "81\"",
+      height: "26.75\"",
+      depth: "37\"",
+      weight: "140 lbs"
+    },
+    colorOptions: [
+      { name: "Dakota Leather in Harvest", hex: "#8B4513", image: "/lovable-uploads/fba  (1).jpg" }
+    ],
+    style: ["Vintage", "70s Inspired", "Contemporary", "Luxury"],
+    materials: ["Semi-aniline cowhide leather", "Hardwood frame", "Walnut veneer", "Kiln-dried hardwood"],
+    careInstructions: ["Blot spills immediately", "Keep out of direct sunlight", "Professional leather cleaning recommended", "Vacuum with handheld attachment", "Leather may patina over time", "Refer to deck label for care information"],
+    features: ["Designed by Adam Rogers", "Benchmade construction", "Certified sustainable hardwood", "Semi-aniline cowhide leather", "Walnut veneer base", "Made in Vietnam", "Vintage-inspired design"],
+    rating: 4.8,
+    reviewCount: 33,
+    inStock: true,
+    buyLink: "https://cb2.com",
+    whyMatch: "The vintage-inspired design with semi-aniline leather perfectly captures the '70s aesthetic you love. The generous silhouette and walnut veneer base create a timeless, lived-in feel that will age beautifully."
+  },
+
+
+
 ];
