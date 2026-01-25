@@ -80,7 +80,7 @@ const Index = () => {
     );
   }
 
-  if (currentState === 'quiz' && roomData) {
+  if (currentState === 'quiz') {
     return (
       <StyleQuiz
         onComplete={handleQuizComplete}
