@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
-import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box, Star, Truck, Shield, Clock, Maximize2 } from 'lucide-react';
+import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box, Star, Truck, Shield, Clock, Maximize2, Zap, Award, TrendingUp } from 'lucide-react';
 import { ThemedFluidBlob } from './ThemedFluidBlob';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -264,6 +264,46 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
+                {/* Floating Animated Elements */}
+                <motion.div
+                  className="absolute top-8 left-8 w-3 h-3 bg-yellow-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <motion.div
+                  className="absolute top-16 right-12 w-2 h-2 bg-orange-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 1, 0.5]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.5
+                  }}
+                />
+                <motion.div
+                  className="absolute bottom-20 left-16 w-2.5 h-2.5 bg-amber-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.6, 1, 0.6]
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1
+                  }}
+                />
+
                 {/* Floating Badges */}
                 <motion.div
                   className="absolute top-4 left-4"
@@ -316,14 +356,86 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
+                      {/* Lenae Logo */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">L</span>
+                        </div>
+                        <span className="text-orange-600 font-bold text-sm">LENAE</span>
+                      </div>
+
                       <h2 className="text-xl font-bold text-gray-900 leading-tight">{currentItem.name}</h2>
                       <p className="text-orange-600 font-medium text-sm">Premium Collection</p>
+
+                      {/* Star Rating with Animation */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ scale: 0, rotate: -180 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              transition={{ delay: i * 0.1, type: "spring", stiffness: 300 }}
+                              className="text-yellow-400"
+                            >
+                              <Star className="w-4 h-4 fill-current" />
+                            </motion.div>
+                          ))}
+                        </div>
+                        <span className="text-sm font-semibold text-gray-700">4.8</span>
+                        <span className="text-xs text-gray-500">(120 reviews)</span>
+                      </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-orange-600">${currentItem.price}</div>
+                      <div className="text-2xl font-bold text-orange-600">C${currentItem.price}</div>
                       <p className="text-xs text-gray-500">CAD</p>
                     </div>
                   </div>
+
+                  {/* Social Proof Badges */}
+                  <div className="flex gap-2 mb-3">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+                    >
+                      <TrendingUp className="w-3 h-3" />
+                      Trending
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium"
+                    >
+                      <Award className="w-3 h-3" />
+                      Best Seller
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                      className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Fast Shipping
+                    </motion.div>
+                  </div>
+
+                  {/* Purchase Now Button */}
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.8, type: "spring", stiffness: 300 }}
+                    className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 px-4 rounded-2xl font-semibold shadow-lg transition-all duration-200 flex items-center justify-center gap-2 mb-3"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => window.open(currentItem.buyLink, '_blank')}
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Purchase Now - C${currentItem.price}
+                  </motion.button>
 
                   {/* Color Selector */}
                   <div className="space-y-2">
@@ -514,11 +626,49 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
               {/* Price & Promotions */}
               <div className="space-y-3">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold text-gray-900">${currentItem.price}</span>
-                  <span className="text-lg text-gray-500 line-through">$1,299</span>
-                  <Badge className="bg-red-500 text-white">Save $200</Badge>
+                  <span className="text-3xl font-bold text-gray-900">C${currentItem.price}</span>
+                  {currentItem.originalPrice && (
+                    <span className="text-lg text-gray-500 line-through">C${currentItem.originalPrice}</span>
+                  )}
+                  {currentItem.originalPrice && (
+                    <Badge className="bg-red-500 text-white">
+                      Save C${currentItem.originalPrice - currentItem.price}
+                    </Badge>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600">Free shipping • 30-day returns</p>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-green-600" />
+                    <span>Delivered to Kitchener, ON : Sep 16th - Oct 8th</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-600" />
+                    <span>30 day satisfaction guarantee</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-orange-600" />
+                    <span>Affirm financing as low as C$192/month</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Description */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Description</h4>
+                <p className="text-sm text-gray-700 leading-relaxed">{currentItem.description}</p>
+              </div>
+
+              {/* Features */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Features</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {currentItem.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Color/Material Variants */}
@@ -564,7 +714,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                   onClick={() => window.open(currentItem.buyLink, '_blank')}
                 >
                   <ShoppingBag className="w-5 h-5 mr-2" />
-                  Add to Cart - ${currentItem.price}
+                  Add to Cart - C${currentItem.price}
                 </Button>
                 <div className="flex gap-2">
                   <Button
@@ -621,32 +771,65 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 <h4 className="font-semibold text-gray-800">Specifications</h4>
                 <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Materials</span>
-                    <span className="font-medium text-gray-800">
-                      {Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-gray-600">Style</span>
                     <span className="font-medium text-gray-800">
                       {Array.isArray(currentItem.style) ? currentItem.style.join(', ') : currentItem.style}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Category</span>
-                    <span className="font-medium text-gray-800">{currentItem.category}</span>
+                    <span className="text-gray-600">General Dimensions</span>
+                    <span className="font-medium text-gray-800">{currentItem.dimensions.height}H x {currentItem.dimensions.width}W x {currentItem.dimensions.depth}D</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Dimensions</span>
-                    <span className="font-medium text-gray-800">72" W x 35" D x 31" H</span>
+                    <span className="text-gray-600">Seat Height</span>
+                    <span className="font-medium text-gray-800">18.5"</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Weight Capacity</span>
-                    <span className="font-medium text-gray-800">500 lbs</span>
+                    <span className="text-gray-600">Seat Depth</span>
+                    <span className="font-medium text-gray-800">23.5"</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Assembly</span>
-                    <span className="font-medium text-gray-800">Required (tools included)</span>
+                    <span className="text-gray-600">Arm Height</span>
+                    <span className="font-medium text-gray-800">25.5"</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Weight</span>
+                    <span className="font-medium text-gray-800">{currentItem.dimensions.weight}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Upholstery Color</span>
+                    <span className="font-medium text-gray-800">Hale Rust</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Materials</span>
+                    <span className="font-medium text-gray-800">
+                      {Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">SKU</span>
+                    <span className="font-medium text-gray-800">SKU26983</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Box Dimensions</span>
+                    <span className="font-medium text-gray-800">26"H x 38"W x 39"L</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Care & Assembly */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800">Care & Assembly</h4>
+                <div className="space-y-2 text-sm">
+                  {currentItem.careInstructions.map((instruction, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-gray-700">{instruction}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-gray-700">Some assembly required (approximately 15 minutes)</span>
                   </div>
                 </div>
               </div>
@@ -745,7 +928,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
             {/* Product Info Overlay */}
             <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 text-white">
               <h3 className="font-semibold text-sm">{currentItem.name}</h3>
-              <p className="text-xs opacity-80">${currentItem.price}</p>
+              <p className="text-xs opacity-80">C${currentItem.price}</p>
             </div>
           </motion.div>
         </motion.div>

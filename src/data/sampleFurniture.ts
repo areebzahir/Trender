@@ -32,42 +32,39 @@ export interface FurnitureItem {
 export const sampleFurniture: FurnitureItem[] = [
   {
     id: "1",
-    name: "Modular Terracotta Sofa",
+    name: "Lenae Velvet Modular Sofa",
     category: "Seating",
     brand: "Article",
-    price: 1899,
-    originalPrice: 2299,
+    price: 2299,
+    originalPrice: 2599,
     images: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop"
+      "/lovable-uploads/leane1 (1).jpg",
+      "/lovable-uploads/leane1 (2).jpg",
+      "/lovable-uploads/leane1 (3).jpg",
+      "/lovable-uploads/leane1 (4).jpg"
     ],
-    description: "A contemporary modular sofa in warm terracotta fabric with clean lines and comfortable cushioning.",
+    description: "A collection for every space. Whether it's a cozy apartment nook or a dedicated home cinema room, Lenae's modular design allows you to create a sofa that is uniquely yours. With plump, high-density foam-filled cushions and a variety of fabric choices, Lenae offers a variety of options. Pre-made sets and individual modular pieces, there's something for every space.",
     dimensions: {
-      width: "84\"",
-      height: "32\"", 
-      depth: "36\"",
-      weight: "120 lbs"
+      width: "104.5\"",
+      height: "34.25\"",
+      depth: "38\"",
+      weight: "169.75 lbs"
     },
     colorOptions: [
-      { name: "Terracotta", hex: "#CD853F", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop" },
-      { name: "Sage Green", hex: "#9CAF88", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop" },
-      { name: "Charcoal", hex: "#36454F", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=800&fit=crop" },
-      { name: "Cream", hex: "#F5F5DC", image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop" }
+      { name: "Red Velvet", hex: "#8B0000", image: "/lovable-uploads/leane1 (1).jpg" }
     ],
-    style: ["Modern", "Mid-Century", "Contemporary"],
-    materials: ["Performance Fabric", "Solid Wood Frame", "High-Density Foam"],
-    careInstructions: ["Spot clean only", "Avoid direct sunlight", "Professional cleaning recommended"],
-    features: ["Modular design", "Removable cushions", "Pet-friendly fabric", "Easy assembly"],
+    style: ["Scandinavian", "Modern", "Contemporary"],
+    materials: ["Velvet", "Solid Wood Frame", "High-Density Foam", "S-springs", "Elastic Webbing"],
+    careInstructions: ["Blot spills with dry cloth", "Gently brush fabric to restore nap", "Dry clean only for persistent stains", "Fluff cushions regularly", "Avoid chemical cleaners"],
+    features: ["Modular design", "High-density foam cushions", "Rubber webbing suspension", "Solid wood frame", "50,000 rub Martindale test", "Fade-resistant fabric", "Anti-crush velvet", "Easy assembly (15 minutes)"],
     rating: 4.8,
-    reviewCount: 247,
+    reviewCount: 1,
     inStock: true,
     buyLink: "https://article.com",
-    whyMatch: "The warm terracotta color and clean lines match your modern aesthetic perfectly. This piece would create a stunning focal point in your living space."
+    whyMatch: "The Hale Rust velvet color and Scandinavian design perfectly match your modern minimalist style. The modular design allows for flexible configuration to suit your living space perfectly."
   },
   {
-    id: "2", 
+    id: "2",
     name: "Scandinavian Oak Coffee Table",
     category: "Tables",
     brand: "West Elm",
@@ -138,7 +135,7 @@ export const sampleFurniture: FurnitureItem[] = [
   {
     id: "4",
     name: "Woven Sage Accent Chair",
-    category: "Seating", 
+    category: "Seating",
     brand: "Urban Outfitters",
     price: 549,
     originalPrice: 649,
