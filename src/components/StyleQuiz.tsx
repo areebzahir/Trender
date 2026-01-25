@@ -32,7 +32,7 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "warm",
         label: "Warm & Earthy",
-        image: "/lovable-uploads/782484ea-826f-4a16-a594-f61989d759dd.png",
+        image: "/lovable-uploads/245d2203-5707-42b8-b7e8-69c7ec4eb939.png",
         description: "Terracotta, sage, cream tones"
       },
       {
@@ -50,7 +50,7 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "neutral",
         label: "Neutral & Minimal",
-        image: "/lovable-uploads/245d2203-5707-42b8-b7e8-69c7ec4eb939.png",
+        image: "/lovable-uploads/782484ea-826f-4a16-a594-f61989d759dd.png",
         description: "Beiges, whites, naturals"
       }
     ]
@@ -62,26 +62,26 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "modern",
         label: "Modern Minimalist",
-        image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Minimalist%20Interior%20with%20Abstract%20Art.png",
         description: "Clean lines, simple forms"
+      },
+      {
+        id: "scandinavian",
+        label: "Scandinavian Cozy",
+        image: "/lovable-uploads/Scandinavian%20Living%20Room.png",
+        description: "Light woods, hygge comfort"
       },
       {
         id: "bohemian",
         label: "Bohemian Eclectic",
-        image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Vibrant%20Interior%20with%20Artistic%20Staircase.png",
         description: "Textured, layered, artistic"
       },
       {
         id: "industrial",
         label: "Industrial Chic",
-        image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Serene%20Modernist%20Oasis.png",
         description: "Metal, concrete, raw materials"
-      },
-      {
-        id: "scandinavian",
-        label: "Scandinavian Cozy",
-        image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400&h=300&fit=crop",
-        description: "Light woods, hygge comfort"
       }
     ]
   },
@@ -92,25 +92,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "natural",
         label: "Natural Wood",
-        image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Rustic%20Retreat%20A-Frame%20Living%20Room.png",
         description: "Oak, walnut, pine"
       },
       {
         id: "metal",
         label: "Metal & Glass",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Elegant%20Living%20Room%20with%20Designer%20Furniture%20and%20Artistic%20Sculptures.png",
         description: "Steel, brass, chrome"
       },
       {
         id: "fabric",
         label: "Soft Textiles",
-        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Cozy%20Living%20Room.png",
         description: "Velvet, linen, cotton"
       },
       {
         id: "mixed",
         label: "Mixed Materials",
-        image: "https://images.unsplash.com/photo-1549497538-303791108f95?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Textured%20Artistic%20Display.png",
         description: "Combination of textures"
       }
     ]
@@ -122,25 +122,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "entertaining",
         label: "Entertaining Guests",
-        image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Intimate%20Dinner%20Gathering.png",
         description: "Social gatherings, dinner parties"
       },
       {
         id: "relaxing",
         label: "Peaceful Retreat",
-        image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Cozy%20Sunlit%20Corner.png",
         description: "Reading, meditation, rest"
       },
       {
         id: "working",
         label: "Productive Workspace",
-        image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Modern%20Minimalist%20Creative%20Workspace%20with%20Retro%20Pop%20Accents.png",
         description: "Home office, creative projects"
       },
       {
         id: "family",
         label: "Family Living",
-        image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400&h=300&fit=crop",
+        image: "/lovable-uploads/Cozy%20Christmas%20Living%20Room.png",
         description: "Kids, pets, daily life"
       }
     ]
@@ -187,11 +187,11 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
       {/* Enhanced Background Images */}
       <div className="absolute inset-0">
-        <div 
+        <div
           className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${orangeChairModernWall})` }}
         />
-        <div 
+        <div
           className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${pinkChairMinimal})` }}
         />
@@ -206,8 +206,8 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={handlePrevious}
           className="mb-6 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105 bg-white/10 backdrop-blur-sm border border-white/20"
         >
@@ -246,7 +246,7 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
                   <span className="text-lg font-semibold text-primary">{Math.round(((currentQuestion + 1) / quizQuestions.length) * 100)}%</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden shadow-inner">
-                  <div 
+                  <div
                     className="bg-gradient-primary h-4 rounded-full transition-all duration-700 shadow-warm relative"
                     style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
                   >
@@ -268,19 +268,18 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
               {/* Enhanced Options Grid */}
               <div className="grid md:grid-cols-2 gap-8 mb-10">
                 {question.options.map((option, index) => (
-                  <Card 
+                  <Card
                     key={option.id}
-                    className={`cursor-pointer transition-all duration-500 hover:scale-105 overflow-hidden rounded-2xl ${
-                      selectedOption === option.id 
-                        ? 'border-2 border-primary bg-primary/10 shadow-2xl ring-4 ring-primary/30 scale-105' 
-                        : 'border border-border/50 hover:border-primary/50 hover:bg-accent/10 shadow-lg hover:shadow-warm'
-                    }`}
+                    className={`cursor-pointer transition-all duration-500 hover:scale-105 overflow-hidden rounded-2xl ${selectedOption === option.id
+                      ? 'border-2 border-primary bg-primary/10 shadow-2xl ring-4 ring-primary/30 scale-105'
+                      : 'border border-border/50 hover:border-primary/50 hover:bg-accent/10 shadow-lg hover:shadow-warm'
+                      }`}
                     onClick={() => handleOptionSelect(option.id)}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="aspect-[4/3] overflow-hidden relative">
-                      <img 
-                        src={option.image} 
+                      <img
+                        src={option.image}
                         alt={option.label}
                         className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                       />
@@ -309,14 +308,13 @@ export const StyleQuiz = ({ onComplete, onBack }: StyleQuizProps) => {
 
               {/* Enhanced Navigation */}
               <div className="flex justify-center">
-                <Button 
+                <Button
                   onClick={handleNext}
                   disabled={!canProceed}
                   variant="hero"
                   size="lg"
-                  className={`min-w-48 h-14 text-lg font-semibold transition-all duration-300 ${
-                    !canProceed ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
-                  }`}
+                  className={`min-w-48 h-14 text-lg font-semibold transition-all duration-300 ${!canProceed ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+                    }`}
                 >
                   {isLastQuestion ? (
                     <>

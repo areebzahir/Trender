@@ -152,6 +152,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [shadcn/ui](https://ui.shadcn.com) for beautiful UI components
 - [Unsplash](https://unsplash.com) for furniture photography
 
----
-
-Made with ❤️ by the Trender team
