@@ -96,10 +96,48 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
     return (
       <div className="min-h-screen relative overflow-hidden">
         {/* Premium Loading Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F7F4F0] via-[#EDE7DD] to-[#DCD8CF]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFA] via-[#F8F6F2] to-[#F2EFE8]">
           {/* Ambient Light Orbs */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-[#FCE2D4]/20 to-transparent rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-radial from-[#EEE6DA]/15 to-transparent rounded-full blur-2xl animate-pulse delay-1000" />
+          <motion.div 
+            className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-radial from-[#FCE2D4]/15 via-[#F8D4C4]/10 to-transparent rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-1/3 right-1/4 w-[450px] h-[450px] bg-gradient-radial from-[#EEE6DA]/12 via-[#E8DCC8]/8 to-transparent rounded-full blur-2xl"
+            animate={{
+              scale: [1, 1.05, 1],
+              opacity: [0.2, 0.5, 0.2]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          
+          {/* Subtle Accent Orb */}
+          <motion.div 
+            className="absolute top-1/2 right-1/8 w-32 h-32 bg-gradient-radial from-[#F76A1C]/10 to-transparent rounded-full blur-lg"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
         </div>
         
         <div className="relative z-10 flex items-center justify-center min-h-screen">
@@ -119,28 +157,59 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Premium Showroom Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#F7F4F0] via-[#EDE7DD] to-[#DCD8CF]">
-        {/* Ambient Light Orbs - Floating Gently */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFA] via-[#F8F6F2] to-[#F2EFE8]">
+        {/* Primary Ambient Light Orbs */}
         <motion.div
-          className="absolute top-1/6 left-1/5 w-96 h-96 bg-gradient-radial from-[#FCE2D4]/12 to-transparent rounded-full blur-3xl"
+          className="absolute top-1/6 left-1/5 w-[500px] h-[500px] bg-gradient-radial from-[#FCE2D4]/15 via-[#F8D4C4]/10 to-transparent rounded-full blur-3xl"
           animate={{
-            x: [0, 30, 0],
-            y: [0, -20, 0],
-            scale: [1, 1.1, 1]
+            x: [0, 40, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.15, 1]
           }}
           transition={{
-            duration: 8,
+            duration: 12,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         />
         
         <motion.div
-          className="absolute top-2/3 right-1/6 w-80 h-80 bg-gradient-radial from-[#EEE6DA]/10 to-transparent rounded-full blur-2xl"
+          className="absolute top-2/3 right-1/6 w-[450px] h-[450px] bg-gradient-radial from-[#EEE6DA]/12 via-[#E8DCC8]/8 to-transparent rounded-full blur-2xl"
           animate={{
-            x: [0, -25, 0],
-            y: [0, 15, 0],
+            x: [0, -35, 0],
+            y: [0, 25, 0],
             scale: [1, 0.9, 1]
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/4 left-1/3 w-[350px] h-[350px] bg-gradient-radial from-[#E8DCC8]/10 via-[#DCD8CF]/6 to-transparent rounded-full blur-2xl"
+          animate={{
+            x: [0, 25, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.25, 1]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 6
+          }}
+        />
+
+        {/* Secondary Floating Elements */}
+        <motion.div
+          className="absolute top-1/3 right-1/4 w-40 h-40 bg-gradient-to-br from-[#FCE2D4]/8 to-[#F8D4C4]/5 rounded-full blur-xl"
+          animate={{
+            x: [0, -20, 0],
+            y: [0, 15, 0],
+            scale: [1, 1.1, 1]
           }}
           transition={{
             duration: 10,
@@ -151,95 +220,94 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
         />
 
         <motion.div
-          className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-gradient-radial from-[#BFB9AE]/8 to-transparent rounded-full blur-2xl"
+          className="absolute bottom-1/3 left-1/5 w-32 h-32 bg-gradient-to-br from-[#EEE6DA]/6 to-[#E8DCC8]/4 rounded-full blur-lg"
           animate={{
-            x: [0, 20, 0],
-            y: [0, -30, 0],
-            scale: [1, 1.2, 1]
+            x: [0, 30, 0],
+            y: [0, -25, 0],
+            scale: [1, 0.95, 1]
           }}
           transition={{
-            duration: 12,
+            duration: 14,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 4
           }}
         />
 
-        {/* Subtle Geometric Floating Elements */}
+        {/* Elegant Geometric Elements */}
         <motion.div
-          className="absolute top-1/4 right-1/3 w-32 h-32 border border-[#BFB9AE]/20 rounded-full"
+          className="absolute top-1/4 right-1/3 w-36 h-36 border border-[#DCD8CF]/25 rounded-full"
           animate={{
             rotate: [0, 360],
-            scale: [1, 1.1, 1]
+            scale: [1, 1.05, 1]
           }}
           transition={{
-            duration: 20,
+            duration: 25,
             repeat: Infinity,
             ease: "linear"
           }}
         />
 
         <motion.div
-          className="absolute bottom-1/3 left-1/6 w-24 h-24 bg-[#DCD8CF]/30 rounded-lg rotate-45"
+          className="absolute bottom-1/3 left-1/6 w-28 h-28 bg-gradient-to-br from-[#DCD8CF]/20 to-[#BFB9AE]/15 rounded-lg rotate-45"
           animate={{
             rotate: [45, 405],
-            y: [0, -20, 0]
+            y: [0, -25, 0]
           }}
           transition={{
-            duration: 15,
+            duration: 20,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         />
 
-        {/* Furniture Silhouette Patterns - Very Subtle */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <svg className="w-full h-full" viewBox="0 0 1200 800" fill="none">
-            {/* Abstract Chair Curves */}
-            <motion.path
-              d="M200 400 Q250 300 300 400 Q350 500 400 400"
-              stroke="#2D1B00"
-              strokeWidth="2"
-              fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            {/* Abstract Lamp Arcs */}
-            <motion.circle
-              cx="800"
-              cy="200"
-              r="60"
-              stroke="#2D1B00"
-              strokeWidth="1"
-              fill="none"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            {/* Abstract Table Lines */}
-            <motion.rect
-              x="600"
-              y="600"
-              width="120"
-              height="20"
-              fill="#2D1B00"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </svg>
-        </div>
+        {/* Subtle Accent Orbs */}
+        <motion.div
+          className="absolute top-1/2 right-1/8 w-24 h-24 bg-gradient-radial from-[#F76A1C]/8 to-transparent rounded-full blur-md"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
 
-        {/* Subtle Texture Overlay */}
+        <motion.div
+          className="absolute bottom-1/6 right-1/4 w-20 h-20 bg-gradient-radial from-[#A5846E]/6 to-transparent rounded-full blur-md"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.5, 0.2]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+
+        {/* Sophisticated Texture Pattern */}
         <div 
-          className="absolute inset-0 opacity-[0.08] mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
           style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, #DCD8CF 2px, transparent 2px),
-                             radial-gradient(circle at 80% 50%, #BFB9AE 1px, transparent 1px)`,
-            backgroundSize: '60px 60px, 40px 40px'
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, #DCD8CF 1px, transparent 1px),
+              radial-gradient(circle at 75% 75%, #BFB9AE 1px, transparent 1px),
+              radial-gradient(circle at 50% 50%, #E8DCC8 0.5px, transparent 0.5px)
+            `,
+            backgroundSize: '50px 50px, 30px 30px, 20px 20px'
+          }}
+        />
+
+        {/* Subtle Grain Effect */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundSize: '200px 200px'
           }}
         />
       </div>
@@ -353,8 +421,47 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
         {/* Visual Separator */}
         <div className="h-px bg-gradient-to-r from-transparent via-[#DCD8CF]/40 to-transparent mx-6"></div>
 
-        {/* Main Content Area */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Main Content Area with Beautiful Backdrop */}
+        <div className="max-w-7xl mx-auto px-6 py-12 relative">
+          {/* Enhanced Backdrop for Curated Picks Section */}
+          <div className="absolute inset-0 -z-10">
+            {/* Primary Backdrop Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCFA]/80 via-[#F8F6F2]/60 to-[#F2EFE8]/80" />
+            
+            {/* Decorative Backdrop Elements */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-radial from-[#FCE2D4]/8 via-[#F8D4C4]/5 to-transparent rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-radial from-[#EEE6DA]/6 via-[#E8DCC8]/4 to-transparent rounded-full blur-2xl" />
+            <div className="absolute top-1/2 left-1/6 w-64 h-64 bg-gradient-radial from-[#E8DCC8]/5 via-[#DCD8CF]/3 to-transparent rounded-full blur-xl" />
+            
+            {/* Subtle Accent Orbs */}
+            <div className="absolute top-1/3 right-1/6 w-32 h-32 bg-gradient-radial from-[#F76A1C]/6 to-transparent rounded-full blur-lg" />
+            <div className="absolute bottom-1/3 left-1/8 w-24 h-24 bg-gradient-radial from-[#A5846E]/5 to-transparent rounded-full blur-md" />
+            
+            {/* Elegant Geometric Elements */}
+            <div className="absolute top-1/4 right-1/3 w-40 h-40 border border-[#DCD8CF]/15 rounded-full opacity-30" />
+            <div className="absolute bottom-1/4 left-1/5 w-28 h-28 bg-gradient-to-br from-[#DCD8CF]/10 to-[#BFB9AE]/8 rounded-lg rotate-45 opacity-40" />
+            
+            {/* Sophisticated Texture Pattern */}
+            <div 
+              className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
+              style={{
+                backgroundImage: `
+                  radial-gradient(circle at 30% 30%, #DCD8CF 1px, transparent 1px),
+                  radial-gradient(circle at 70% 70%, #BFB9AE 1px, transparent 1px)
+                `,
+                backgroundSize: '60px 60px, 40px 40px'
+              }}
+            />
+            
+            {/* Subtle Grain Effect */}
+            <div 
+              className="absolute inset-0 opacity-[0.01]"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                backgroundSize: '200px 200px'
+              }}
+            />
+          </div>
           {/* Premium Title Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
