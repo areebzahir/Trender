@@ -11,7 +11,6 @@ export function FurnitureScene() {
     <Card className="w-full h-[500px] bg-gradient-to-br from-[#F5F3EF] to-[#E2E0DA] relative overflow-hidden border-0 shadow-2xl">
       <Spotlight
         className="-top-40 left-0 md:left-60 md:-top-20"
-        fill="#C24E40"
       />
       
       <div className="flex h-full">

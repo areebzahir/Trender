@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
 import { ChoicePage } from "@/components/ChoicePage";
 import { RoomUpload } from "@/components/RoomUpload";
-import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
+import TrenderSwipeScreen from "@/components/TrenderSwipeScreen";
 import { StyleQuiz } from "@/components/StyleQuiz";
 import { StyleResults } from "@/components/StyleResults";
 
@@ -120,12 +120,9 @@ const Index = () => {
     );
   }
 
-  if (currentState === 'swipe' && roomData) {
+  if (currentState === 'swipe') {
     return (
-      <EnhancedSwipeInterface
-        onBack={() => setCurrentState('results')}
-        roomData={roomData}
-      />
+      <TrenderSwipeScreen />
     );
   }
 
