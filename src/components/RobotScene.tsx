@@ -11,7 +11,7 @@ export function RobotScene() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const furnitureImages = [
-    '/lovable-uploads/ChatGPT Image Jul 31, 2025, 03_42_19 PM.png',
+    '/lovable-uploads/1.png',
     '/lovable-uploads/Modern Minimalistic Living Room in Orange Tones.png'
   ];
 
@@ -53,7 +53,7 @@ export function RobotScene() {
               className="w-full h-full bg-cover"
               style={{
                 backgroundImage: `url('${furnitureImages[currentImageIndex]}')`,
-                backgroundPosition: currentImageIndex === 0 ? 'center 60%' : 'center 30%'
+                backgroundPosition: currentImageIndex === 0 ? 'center 80%' : 'center'
               }}
               key={currentImageIndex}
               initial={{ opacity: 0 }}
@@ -72,8 +72,10 @@ export function RobotScene() {
               </div>
 
               {/* Image counter */}
-              <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
-                <span className="text-xs text-white">{currentImageIndex === 0 ? 'ChatGPT' : 'Modern Living'}</span>
+              <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-3 py-2 rounded-full max-w-xs">
+                <span className="text-xs text-white whitespace-nowrap">
+                  {currentImageIndex === 0 ? 'Press to decorate your room' : 'Decorated room'}
+                </span>
               </div>
             </motion.div>
           </motion.div>
