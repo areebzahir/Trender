@@ -4,8 +4,9 @@ import { ChoicePage } from "@/components/ChoicePage";
 import { RoomUpload } from "@/components/RoomUpload";
 import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
 import { StyleQuiz } from "@/components/StyleQuiz";
+import { StyleResults } from "@/components/StyleResults";
 
-type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'swipe';
+type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'results' | 'swipe';
 
 interface RoomData {
   image: File | null;
@@ -28,8 +29,21 @@ const Index = () => {
   };
 
   const handleQuizComplete = (results: Record<string, string>) => {
-    setRoomData(prev => prev ? { ...prev, quizResults: results } : null);
+    console.log('Quiz completed with results:', results);
+    setRoomData(prev => {
+      const newData = prev ? { ...prev, quizResults: results } : { image: null, preferences: '', quizResults: results };
+      console.log('Setting roomData:', newData);
+      return newData;
+    });
+    setCurrentState('results');
+  };
+
+  const handleResultsContinue = () => {
     setCurrentState('swipe');
+  };
+
+  const handleUploadFromResults = () => {
+    setCurrentState('upload');
   };
 
   const handleBackToLanding = () => {
@@ -50,6 +64,12 @@ const Index = () => {
   };
 
   const handleStyleQuiz = () => {
+    // Initialize roomData with empty quiz results for direct quiz access
+    setRoomData({
+      image: null,
+      preferences: '',
+      quizResults: {}
+    });
     setCurrentState('quiz');
   };
 
@@ -63,7 +83,7 @@ const Index = () => {
 
   if (currentState === 'choice') {
     return (
-      <ChoicePage 
+      <ChoicePage
         onBack={handleBackToLanding}
         onRoomDecorating={handleRoomDecorating}
         onStyleQuiz={handleStyleQuiz}
@@ -73,7 +93,7 @@ const Index = () => {
 
   if (currentState === 'upload') {
     return (
-      <RoomUpload 
+      <RoomUpload
         onContinue={handleRoomUpload}
         onBack={handleBackToChoice}
       />
@@ -89,10 +109,21 @@ const Index = () => {
     );
   }
 
+  if (currentState === 'results' && roomData?.quizResults) {
+    return (
+      <StyleResults
+        results={roomData.quizResults}
+        onBack={handleBackToQuiz}
+        onContinue={handleResultsContinue}
+        onUploadRoom={handleUploadFromResults}
+      />
+    );
+  }
+
   if (currentState === 'swipe' && roomData) {
     return (
-      <EnhancedSwipeInterface 
-        onBack={handleBackToQuiz}
+      <EnhancedSwipeInterface
+        onBack={() => setCurrentState('results')}
         roomData={roomData}
       />
     );
