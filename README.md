@@ -22,8 +22,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/trender.git
-   cd trender
+   git clone https://github.com/Haaziq-code/Trender.git
+   cd Trender
    ```
 
 2. **Install dependencies**
