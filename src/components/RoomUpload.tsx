@@ -5,12 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Camera, 
-  Upload, 
-  ArrowRight, 
-  X, 
-  ImageIcon, 
+import {
+  Camera,
+  Upload,
+  ArrowRight,
+  X,
+  ImageIcon,
   Sparkles,
   Home,
   Palette,
@@ -126,7 +126,7 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
 
   const quickStyleOptions = [
     "Modern & Minimalist",
-    "Cozy & Bohemian", 
+    "Cozy & Bohemian",
     "Scandinavian",
     "Industrial",
     "Traditional",
@@ -137,11 +137,11 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
       {/* Background Images */}
       <div className="absolute inset-0">
-        <div 
+        <div
           className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-8"
           style={{ backgroundImage: `url(${warmLivingRoom})` }}
         />
-        <div 
+        <div
           className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center opacity-8"
           style={{ backgroundImage: `url(${abstractDesign})` }}
         />
@@ -155,8 +155,8 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={onBack}
           className="mb-8 text-lg font-semibold px-6 py-3 bg-white/80 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/40 hover:bg-white/90 text-primary hover:text-primary/80 transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-warm rounded-xl"
         >
@@ -167,7 +167,7 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 animate-fade-in">
             <div className="bg-white/40 backdrop-blur-md border border-white/50 rounded-3xl p-12 mb-8 shadow-lg">
-              <motion.div 
+              <motion.div
                 className="flex items-center justify-center mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -195,7 +195,7 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
             <Card className="border border-primary/20 bg-white/60 backdrop-blur-sm shadow-lg rounded-2xl">
               <div className="p-10">
                 {/* Upload Area */}
-                <motion.div 
+                <motion.div
                   className="mb-10"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -206,14 +206,14 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                     Room Photo
                   </Label>
                   {!imagePreview ? (
-                    <motion.div 
+                    <motion.div
                       className="border-2 border-dashed border-primary/30 rounded-2xl p-12 text-center hover:border-primary/50 transition-all duration-300 cursor-pointer bg-white/80 hover:bg-white/90"
                       onClick={() => fileInputRef.current?.click()}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex flex-col items-center space-y-6">
-                        <motion.div 
+                        <motion.div
                           className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center shadow-warm"
                           animate={{ y: [0, -8, 0] }}
                           transition={{ duration: 2, repeat: Infinity }}
@@ -237,16 +237,16 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                       </div>
                     </motion.div>
                   ) : (
-                    <motion.div 
+                    <motion.div
                       className="relative"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <img 
-                        src={imagePreview} 
+                      <img
+                        src={imagePreview}
                         alt="Uploaded room"
-                        className="w-full h-64 object-cover rounded-lg shadow-warm"
+                        className="w-full max-h-96 object-contain rounded-lg shadow-warm"
                       />
                       <motion.div
                         whileHover={{ scale: 1.1 }}

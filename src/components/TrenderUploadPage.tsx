@@ -108,11 +108,11 @@ const TrenderUploadPage: React.FC = () => {
     <div className="min-h-screen relative overflow-hidden">
       {/* Background Images (blend with overlays) */}
       <div className="absolute inset-0 z-0">
-        <div 
+        <div
           className="absolute top-0 left-0 w-1/2 h-full bg-cover bg-center opacity-80"
           style={{ backgroundImage: `url(${warmLivingRoom})` }}
         />
-        <div 
+        <div
           className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center opacity-80"
           style={{ backgroundImage: `url(${abstractDesign})` }}
         />
@@ -196,11 +196,10 @@ const TrenderUploadPage: React.FC = () => {
             <div className="relative p-8">
               {!uploadedImage ? (
                 <motion.div
-                  className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
-                    isDragging 
-                      ? 'border-orange-400 bg-orange-50/50 scale-105' 
+                  className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${isDragging
+                      ? 'border-orange-400 bg-orange-50/50 scale-105'
                       : 'border-orange-300/50 hover:border-orange-400/70'
-                  }`}
+                    }`}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -249,7 +248,7 @@ const TrenderUploadPage: React.FC = () => {
                   <img
                     src={uploadedImage}
                     alt="Uploaded room"
-                    className="w-full h-64 object-cover"
+                    className="w-full max-h-96 object-contain"
                   />
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
@@ -295,7 +294,7 @@ const TrenderUploadPage: React.FC = () => {
                 <motion.div
                   className="absolute inset-0 rounded-xl pointer-events-none"
                   animate={{
-                    boxShadow: prompt 
+                    boxShadow: prompt
                       ? ["0 0 0 0 rgba(251, 146, 60, 0)", "0 0 0 4px rgba(251, 146, 60, 0.1)", "0 0 0 0 rgba(251, 146, 60, 0)"]
                       : "none"
                   }}
