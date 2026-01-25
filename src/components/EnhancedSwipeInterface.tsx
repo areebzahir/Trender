@@ -20,10 +20,10 @@ import {
 import { ImageCarousel } from "./ImageCarousel";
 import { ColorPalette } from "./ColorPalette";
 import { ProductDetailModal } from "./ProductDetailModal";
-import { sampleFurniture, type FurnitureItem } from "@/data/sampleFurniture";
+import { type FurnitureItem } from "@/data/sampleFurniture";
 import { useToast } from "@/hooks/use-toast";
 import { TasteProfileDashboard } from "./TasteProfileDashboard";
-import { qlooService, QlooTasteProfile } from "@/services/qlooApi";
+import { qlooService, QlooTasteProfile, QlooRecommendation } from "@/services/qlooApi";
 import { gptService, GPTExplanation, RoomVisualization } from "@/services/gptService";
 
 interface EnhancedSwipeInterfaceProps {
@@ -32,7 +32,7 @@ interface EnhancedSwipeInterfaceProps {
 }
 
 interface SwipeHistoryItem {
-  item: FurnitureItem;
+  item: QlooRecommendation; // Changed from FurnitureItem
   liked: boolean;
   timestamp: Date;
   explanation?: GPTExplanation;
@@ -40,7 +40,8 @@ interface SwipeHistoryItem {
 
 export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterfaceProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [matches, setMatches] = useState<FurnitureItem[]>([]);
+  const [recommendations, setRecommendations] = useState<QlooRecommendation[]>([]); // New state for QLOO recommendations
+  const [matches, setMatches] = useState<QlooRecommendation[]>([]); // Changed from FurnitureItem
   const [swipeHistory, setSwipeHistory] = useState<SwipeHistoryItem[]>([]);
   const [showMatches, setShowMatches] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -57,30 +58,37 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const currentItem = sampleFurniture[currentIndex];
+  const currentItem = recommendations[currentIndex]; // Use recommendations instead of sampleFurniture
 
-  // Initialize taste profile
+  // Initialize taste profile and fetch recommendations
   useEffect(() => {
-    const initializeTasteProfile = async () => {
+    const initializeData = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const profile = await qlooService.analyzeTasteProfile(
           roomData.preferences, 
           roomData.image || undefined
         );
         setTasteProfile(profile);
+
+        // Fetch recommendations after taste profile is analyzed
+        const fetchedRecommendations = await qlooService.getFurnitureRecommendations(profile);
+        setRecommendations(fetchedRecommendations);
       } catch (error) {
-        console.error('Error initializing taste profile:', error);
+        console.error('Error initializing data:', error);
         toast({
-          title: "Profile Analysis",
-          description: "Using default preferences to get you started",
+          title: "Initialization Error",
+          description: "Failed to load data. Using default recommendations.",
+          variant: "destructive"
         });
+        // Fallback to sampleFurniture if API fails
+        // setRecommendations(sampleFurniture as unknown as QlooRecommendation[]); // Removed fallback
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeTasteProfile();
+    initializeData();
   }, [roomData]);
 
   const handleSwipe = async (direction: 'left' | 'right') => {
@@ -382,7 +390,7 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
   }
 
   // End of furniture items
-  if (currentIndex >= sampleFurniture.length) {
+  if (currentIndex >= recommendations.length) { // Use recommendations.length
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md mx-auto p-8 text-center bg-gradient-card">
@@ -477,6 +485,24 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
                         <ExternalLink className="w-4 h-4 mr-2" />
                         Shop Now
                       </Button>
+                      {item.storeLocations && item.storeLocations.length > 0 && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            // Handle displaying store locations, e.g., in a modal or new page
+                            toast({
+                              title: "Store Locations",
+                              description: `Opening map for stores near ${item.name}`,
+                            });
+                            // For now, let's just log the first store location
+                            console.log("Store Location:", item.storeLocations[0]);
+                            // TODO: Implement actual map integration or detailed store list display
+                          }}
+                        >
+                          <MapPin className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button 
                         size="sm" 
                         variant="outline"
@@ -513,7 +539,7 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
           </Button>
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              {currentIndex + 1} of {sampleFurniture.length}
+              {currentIndex + 1} of {recommendations.length} {/* Use recommendations.length */}
             </p>
           </div>
           <div className="flex gap-2">
@@ -595,35 +621,72 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
                 </div>
               </div>
 
-              {currentItem.whyMatch && (
+              {currentItem.reasoning && (
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                   <div className="flex items-start gap-2">
                     <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-foreground">{currentItem.whyMatch}</p>
+                    <p className="text-sm text-foreground">{currentItem.reasoning}</p>
                   </div>
                 </div>
               )}
 
               <div className="space-y-3">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-current text-accent" />
-                    {currentItem.rating} ({currentItem.reviewCount})
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Ruler className="w-4 h-4" />
-                    {currentItem.dimensions.width} W
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Palette className="w-4 h-4" />
-                    {currentItem.colorOptions.length} colors
-                  </div>
+                  {currentItem.rating && (
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-current text-accent" />
+                      {currentItem.rating} ({currentItem.reviewCount})
+                    </div>
+                  )}
+                  {currentItem.dimensions && (
+                    <div className="flex items-center gap-1">
+                      <Ruler className="w-4 h-4" />
+                      {currentItem.dimensions.width} W
+                    </div>
+                  )}
+                  {currentItem.colorOptions && currentItem.colorOptions.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Palette className="w-4 h-4" />
+                      {currentItem.colorOptions.length} colors
+                    </div>
+                  )}
                 </div>
 
-                <ColorPalette 
-                  colors={currentItem.colorOptions}
-                  showImages={false}
-                />
+                {currentItem.colorOptions && currentItem.colorOptions.length > 0 && (
+                  <ColorPalette 
+                    colors={currentItem.colorOptions}
+                    showImages={false}
+                  />
+                )}
+                
+                {currentItem.buyLink && (
+                  <Button 
+                    className="w-full"
+                    onClick={() => window.open(currentItem.buyLink, '_blank')}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Buy Now
+                  </Button>
+                )}
+                
+                {currentItem.storeLocations && currentItem.storeLocations.length > 0 && (
+                  <Button 
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => {
+                      toast({
+                        title: "Store Locations",
+                        description: `Finding stores near you for ${currentItem.name}`,
+                      });
+                      // TODO: Integrate with a map service or display a list of stores
+                      console.log("Store Locations:", currentItem.storeLocations);
+                    }}
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Find in Stores
+                  </Button>
+                )}
+
               </div>
             </div>
           </Card>
