@@ -58,20 +58,20 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
   if (!currentItem) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="mb-6"
           >
-            <Sparkles className="w-16 h-16 mx-auto text-indigo-500 mb-4" />
-            <h2 className="text-3xl font-bold text-slate-800 mb-2">All Done!</h2>
-            <p className="text-slate-600">You've discovered all our premium pieces</p>
+            <Sparkles className="w-16 h-16 mx-auto text-orange-500 mb-4" />
+            <h2 className="text-3xl font-bold text-orange-900 mb-2">That's all for now!</h2>
+            <p className="text-orange-600">You've discovered all our amazing furniture pieces</p>
           </motion.div>
           <Button
             onClick={onBack}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-2xl font-medium shadow-lg"
+            className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-3 rounded-2xl font-medium shadow-lg"
           >
             Back to Home
           </Button>
@@ -178,7 +178,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 relative overflow-hidden">
       {/* Floating Header */}
       <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
         <motion.button
@@ -187,7 +187,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="w-5 h-5 text-slate-700" />
+          <ArrowLeft className="w-5 h-5 text-orange-700" />
         </motion.button>
 
         <motion.div
@@ -196,8 +196,8 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h1 className="text-xl font-bold text-slate-800">Discover</h1>
-          <p className="text-xs text-slate-500 mt-1">{currentIndex + 1} of {sampleFurniture.length}</p>
+          <h1 className="text-xl font-bold text-orange-900">Trender</h1>
+          <p className="text-xs text-orange-600 mt-1">{currentIndex + 1} of {sampleFurniture.length}</p>
         </motion.div>
 
         <motion.button
@@ -206,7 +206,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <ShoppingBag className="w-5 h-5 text-slate-700" />
+          <ShoppingBag className="w-5 h-5 text-orange-700" />
         </motion.button>
       </div>
 
@@ -263,9 +263,9 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
+                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
                     <Sparkles className="w-3 h-3 mr-1" />
-                    Premium
+                    🔥 Trending
                   </Badge>
                 </motion.div>
 
@@ -276,7 +276,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                   transition={{ delay: 0.4 }}
                 >
                   <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg">
-                    <span className="text-sm font-bold text-emerald-600">{calculateMatchScore()}%</span>
+                    <span className="text-sm font-bold text-green-600">{calculateMatchScore()}% Match</span>
                   </div>
                 </motion.div>
 
@@ -298,25 +298,25 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
-                      <h2 className="text-xl font-bold text-slate-800 leading-tight">{currentItem.name}</h2>
-                      <p className="text-indigo-600 font-medium text-sm">Premium Collection</p>
+                      <h2 className="text-xl font-bold text-gray-900 leading-tight">{currentItem.name}</h2>
+                      <p className="text-orange-600 font-medium text-sm">Premium Collection</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-slate-800">${currentItem.price}</div>
-                      <p className="text-xs text-slate-500">CAD</p>
+                      <div className="text-2xl font-bold text-orange-600">${currentItem.price}</div>
+                      <p className="text-xs text-gray-500">CAD</p>
                     </div>
                   </div>
 
                   {/* Color Selector */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-slate-600">Colors</p>
+                    <p className="text-sm font-medium text-gray-700">Available Colors:</p>
                     <div className="flex gap-2">
                       {getAvailableColors().map((color, index) => (
                         <motion.button
                           key={index}
                           className={`w-8 h-8 rounded-full border-2 shadow-sm ${selectedColorIndex === index
-                            ? 'border-indigo-500 shadow-indigo-200'
-                            : 'border-slate-200'
+                            ? 'border-orange-500 shadow-orange-200'
+                            : 'border-gray-300'
                             }`}
                           style={{ backgroundColor: color.value }}
                           onClick={() => setSelectedColorIndex(index)}
@@ -330,7 +330,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
                 {/* Match Reason (Expandable) */}
                 <motion.div
-                  className={`bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100 overflow-hidden ${showMatchReason ? 'h-auto' : 'h-12'
+                  className={`bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 overflow-hidden ${showMatchReason ? 'h-auto' : 'h-12'
                     }`}
                   animate={{ height: showMatchReason ? 'auto' : 48 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -340,22 +340,22 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                       className="flex items-center justify-between cursor-pointer"
                       onClick={() => setShowMatchReason(!showMatchReason)}
                     >
-                      <span className="text-sm font-medium text-indigo-800">Why this matches you</span>
+                      <span className="text-sm font-medium text-orange-800">Why this matches you</span>
                       <motion.div
                         animate={{ rotate: showMatchReason ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <Info className="w-4 h-4 text-indigo-600" />
+                        <Info className="w-4 h-4 text-orange-600" />
                       </motion.div>
                     </div>
                     {showMatchReason && (
                       <motion.p
-                        className="text-sm text-indigo-700 mt-2 leading-relaxed"
+                        className="text-sm text-orange-800 mt-2 leading-relaxed"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}
                       >
-                        {getMatchReason()}
+                        <span className="font-semibold">Perfect match:</span> {getMatchReason()}
                       </motion.p>
                     )}
                   </div>
@@ -374,7 +374,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
             {/* Pass Button */}
             <motion.button
               onClick={handlePass}
-              className="flex-1 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+              className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -385,7 +385,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
             {/* Super Like / AR View */}
             <motion.button
               onClick={() => setShowDetails(!showDetails)}
-              className="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl shadow-lg transition-all duration-200"
+              className="p-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl shadow-lg transition-all duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -395,7 +395,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
             {/* Like Button */}
             <motion.button
               onClick={handleLike}
-              className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+              className="flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -406,12 +406,12 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
           {/* Swipe Hint */}
           <motion.p
-            className="text-center text-xs text-slate-500 mt-3"
+            className="text-center text-xs text-gray-600 mt-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            Swipe horizontally or use buttons • Tap for details
+            Swipe left to pass • Tap eye to view details • Swipe right to match
           </motion.p>
         </div>
       </div>
@@ -437,15 +437,15 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
               {/* Header with drag handle */}
               <div className="text-center">
-                <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-slate-800">{currentItem.name}</h3>
-                <p className="text-slate-600">Premium Collection</p>
+                <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900">{currentItem.name}</h3>
+                <p className="text-orange-600">Premium Collection</p>
               </div>
 
               {/* Quick Actions */}
               <div className="flex gap-3">
                 <Button
-                  className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
                   onClick={() => window.open(currentItem.buyLink, '_blank')}
                 >
                   <ShoppingBag className="w-4 h-4 mr-2" />
@@ -453,7 +453,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
                   onClick={() => {
                     // Add AR functionality here
                     console.log('AR View activated');
@@ -466,7 +466,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
               {/* Image Gallery */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-slate-800">Gallery</h4>
+                <h4 className="font-semibold text-gray-800">Gallery</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {currentItem.images.slice(0, 4).map((image, index) => (
                     <motion.img
@@ -483,23 +483,23 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
               {/* Specifications */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-slate-800">Details</h4>
-                <div className="bg-slate-50 p-4 rounded-2xl space-y-3">
+                <h4 className="font-semibold text-gray-800">Specifications</h4>
+                <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Materials</span>
-                    <span className="font-medium text-slate-800">
+                    <span className="text-gray-600">Materials</span>
+                    <span className="font-medium text-gray-800">
                       {Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Style</span>
-                    <span className="font-medium text-slate-800">
+                    <span className="text-gray-600">Style</span>
+                    <span className="font-medium text-gray-800">
                       {Array.isArray(currentItem.style) ? currentItem.style.join(', ') : currentItem.style}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Category</span>
-                    <span className="font-medium text-slate-800">{currentItem.category}</span>
+                    <span className="text-gray-600">Category</span>
+                    <span className="font-medium text-gray-800">{currentItem.category}</span>
                   </div>
                 </div>
               </div>
