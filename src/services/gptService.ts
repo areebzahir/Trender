@@ -126,8 +126,6 @@ Key themes in your taste:
 
 Your evolving aesthetic suggests someone who values both form and function, with a preference for pieces that will age beautifully and remain relevant for years to come.`;
     } catch (error) {
-      console.log('✅ Generated style summary');
-      return summary;
       console.error('Error generating style summary:', error);
       return 'Your style is developing beautifully with a focus on quality, comfort, and timeless design.';
     }

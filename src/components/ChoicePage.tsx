@@ -45,7 +45,7 @@ export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePage
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto flex-1">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto flex-1 min-h-0">
           {/* Room Decorating Option */}
           <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in">
             <div className="aspect-[4/5] relative">
