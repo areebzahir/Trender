@@ -5,8 +5,9 @@ import { RoomUpload } from "@/components/RoomUpload";
 import TrenderSwipeScreen from "@/components/TrenderSwipeScreen";
 import { StyleQuiz } from "@/components/StyleQuiz";
 import { StyleResults } from "@/components/StyleResults";
+import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
 
-type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'results' | 'swipe';
+type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'results' | 'swipe' | 'enhanced-swipe';
 
 interface RoomData {
   image: File | null;
@@ -77,6 +78,14 @@ const Index = () => {
     setCurrentState('choice');
   };
 
+  const handleGoToEnhancedSwipe = () => {
+    setCurrentState('enhanced-swipe');
+  };
+
+  const handleBackToSwipe = () => {
+    setCurrentState('swipe');
+  };
+
   if (currentState === 'landing') {
     return <LandingPage onGetStarted={handleGetStarted} />;
   }
@@ -122,7 +131,20 @@ const Index = () => {
 
   if (currentState === 'swipe') {
     return (
-      <TrenderSwipeScreen />
+      <TrenderSwipeScreen
+        onBack={handleBackToChoice}
+        onGoToEnhancedSwipe={handleGoToEnhancedSwipe}
+        roomData={roomData}
+      />
+    );
+  }
+
+  if (currentState === 'enhanced-swipe' && roomData) {
+    return (
+      <EnhancedSwipeInterface
+        onBack={handleBackToSwipe}
+        roomData={roomData}
+      />
     );
   }
 

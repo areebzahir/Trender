@@ -6,30 +6,41 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { useWishlistStore, WishlistItem } from './WishlistStore';
 import { sampleFurniture } from '@/data/sampleFurniture';
-import { useNavigate } from 'react-router-dom';
 
-const TrenderSwipeScreen: React.FC = () => {
-  const navigate = useNavigate();
+interface RoomData {
+  image: File | null;
+  preferences: string;
+  specific?: string;
+  quizResults?: Record<string, string>;
+}
+
+interface TrenderSwipeScreenProps {
+  onBack: () => void;
+  onGoToEnhancedSwipe: () => void;
+  roomData: RoomData | null;
+}
+
+const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToEnhancedSwipe, roomData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [interestScore, setInterestScore] = useState(0);
   const { add: addToWishlist } = useWishlistStore();
-  
+
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
-  
+
   const constraintsRef = useRef(null);
-  
+
   const currentItem = sampleFurniture[currentIndex];
-  
+
   if (!currentItem) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-orange-900 mb-4">That's all for now!</h2>
-          <Button onClick={() => navigate('/')} className="bg-gradient-to-r from-orange-500 to-amber-500">
+          <Button onClick={onBack} className="bg-gradient-to-r from-orange-500 to-amber-500">
             Back to Home
           </Button>
         </div>
@@ -39,7 +50,7 @@ const TrenderSwipeScreen: React.FC = () => {
 
   const handleDragEnd = (event: any, info: PanInfo) => {
     const threshold = 150;
-    
+
     if (info.offset.x > threshold) {
       // Swipe right - Add to wishlist
       handleLike();
@@ -69,7 +80,7 @@ const TrenderSwipeScreen: React.FC = () => {
       link: currentItem.buyLink,
       category: currentItem.category
     };
-    
+
     addToWishlist(wishlistItem);
     nextCard();
   };
@@ -131,7 +142,7 @@ const TrenderSwipeScreen: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/')}
+          onClick={onBack}
           className="text-orange-700 hover:bg-orange-100"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -144,7 +155,7 @@ const TrenderSwipeScreen: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/wishlist')}
+          onClick={onGoToEnhancedSwipe}
           className="text-orange-700 hover:bg-orange-100"
         >
           Wishlist
@@ -171,17 +182,17 @@ const TrenderSwipeScreen: React.FC = () => {
                 alt={currentItem.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              
+
               {/* Trending Badge */}
               <Badge className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
                 🔥 Trending
               </Badge>
-              
+
               {/* Match Score */}
               <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
                 <span className="text-sm font-bold text-green-600">{calculateMatchScore()}% Match</span>
               </div>
-              
+
               {/* Rotation Icon */}
               <motion.div
                 className="absolute bottom-3 right-3 bg-black/50 text-white p-2 rounded-full cursor-pointer"
@@ -217,9 +228,8 @@ const TrenderSwipeScreen: React.FC = () => {
                     {currentItem.colorOptions.map((color, index) => (
                       <motion.button
                         key={index}
-                        className={`w-8 h-8 rounded-full border-2 ${
-                          selectedVariant === index ? 'border-orange-500' : 'border-gray-300'
-                        }`}
+                        className={`w-8 h-8 rounded-full border-2 ${selectedVariant === index ? 'border-orange-500' : 'border-gray-300'
+                          }`}
                         style={{ backgroundColor: getColorValue(color) }}
                         onClick={() => setSelectedVariant(index)}
                         whileTap={{ scale: 0.9 }}
@@ -246,7 +256,7 @@ const TrenderSwipeScreen: React.FC = () => {
                   <X className="w-5 h-5" />
                   Pass
                 </motion.button>
-                
+
                 <motion.button
                   onClick={handleLike}
                   className="flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
@@ -255,7 +265,7 @@ const TrenderSwipeScreen: React.FC = () => {
                   <Heart className="w-5 h-5" />
                   Love
                 </motion.button>
-                
+
                 <motion.button
                   onClick={handleStyleMatch}
                   className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
