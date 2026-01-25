@@ -2,6 +2,8 @@
 
 > Discover furniture that matches your unique style. Upload your room, swipe through AI-curated pieces, and create the perfect space you've always dreamed of.
 
+**Tinder - but for furniture!** 🪑✨
+
 ## ✨ Features
 
 - **🎨 Style Discovery**: Upload room photos or take a visual quiz to discover your design aesthetic
