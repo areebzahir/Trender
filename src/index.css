@@ -341,3 +341,23 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Spotlight animation */
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+.animate-spotlight {
+  animation: spotlight 2s ease 0s 1 forwards;
+}
