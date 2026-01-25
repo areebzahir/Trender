@@ -40,7 +40,7 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  const handleDetectLocation = () => {
+  const handleDetectLocation = async () => {
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by your browser.");
       return;
@@ -48,9 +48,24 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
     setIsLocating(true);
     setLocationError(null);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation(`${position.coords.latitude}, ${position.coords.longitude}`);
-        setIsLocating(false);
+      async (position) => {
+        try {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          // Use OpenStreetMap Nominatim for reverse geocoding
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+          if (!response.ok) throw new Error("Failed to fetch address");
+          const data = await response.json();
+          // Compose a nice address string
+          const address = data.display_name ||
+            [data.address.road, data.address.city, data.address.state, data.address.country]
+              .filter(Boolean).join(", ");
+          setLocation(address);
+        } catch (err) {
+          setLocationError("Could not determine address from location.");
+        } finally {
+          setIsLocating(false);
+        }
       },
       (error) => {
         setLocationError("Unable to retrieve your location.");
