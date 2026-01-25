@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Camera, Palette } from "lucide-react";
+import { ArrowLeft, Camera, Palette, Upload, Sparkles } from "lucide-react";
+import modernLivingRoom from "@/assets/modern-living-room-1.jpg";
+import orangeChairModern from "@/assets/orange-chair-modern.jpg";
 
 interface ChoicePageProps {
   onBack: () => void;
@@ -10,76 +12,124 @@ interface ChoicePageProps {
 
 export const ChoicePage = ({ onBack, onRoomDecorating, onStyleQuiz }: ChoicePageProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-40 right-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/20 rounded-full blur-2xl"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <Button 
           variant="ghost" 
           onClick={onBack}
-          className="mb-8 text-muted-foreground hover:text-foreground"
+          className="mb-8 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
-            Choose Your Journey
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            How would you like to discover your perfect furniture match?
+        <div className="text-center mb-16 animate-fade-in">
+          <div className="flex items-center justify-center mb-4">
+            <Sparkles className="w-8 h-8 text-primary mr-3 animate-pulse" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary-foreground to-accent bg-clip-text text-transparent">
+              Choose Your Journey
+            </h1>
+            <Sparkles className="w-8 h-8 text-primary ml-3 animate-pulse" />
+          </div>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Discover your perfect furniture match through personalized experiences designed just for you
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 max-w-7xl mx-auto">
           {/* Room Decorating Option */}
-          <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105">
-            <div className="aspect-[4/5] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/20 dark:to-indigo-950/20 relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <div className="absolute top-6 left-6">
-                <Camera className="w-8 h-8 text-primary" />
+          <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in">
+            <div className="aspect-[4/5] relative">
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                style={{ backgroundImage: `url(${modernLivingRoom})` }}
+              />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+              {/* Accent Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+                <Upload className="w-8 h-8 text-white" />
               </div>
-              <div className="absolute bottom-6 left-6 right-6">
-                <h2 className="text-2xl font-bold mb-2 text-foreground">Room Decorating</h2>
-                <p className="text-muted-foreground mb-4">
-                  Upload a photo of your space and let our AI analyze your room to suggest perfect furniture matches
+              
+              <div className="absolute bottom-8 left-8 right-8 text-white">
+                <div className="flex items-center mb-3">
+                  <Camera className="w-6 h-6 mr-2 text-primary" />
+                  <span className="text-sm font-medium uppercase tracking-wider text-primary">AI Powered</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">
+                  Room Decorating
+                </h2>
+                <p className="text-white/90 mb-6 leading-relaxed">
+                  Upload a photo of your space and let our advanced AI analyze your room to suggest perfect furniture matches tailored to your style
                 </p>
                 <Button 
                   onClick={onRoomDecorating}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-300 h-12 text-lg font-semibold hover:scale-105"
                 >
-                  Upload Your Room
+                  Upload Your Room Photo
                 </Button>
               </div>
             </div>
           </Card>
 
           {/* Style Quiz Option */}
-          <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105">
-            <div className="aspect-[4/5] bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950/20 dark:to-pink-950/20 relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <div className="absolute top-6 left-6">
-                <Palette className="w-8 h-8 text-primary" />
+          <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="aspect-[4/5] relative">
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                style={{ backgroundImage: `url(${orangeChairModern})` }}
+              />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+              {/* Accent Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+                <Palette className="w-8 h-8 text-white" />
               </div>
-              <div className="absolute bottom-6 left-6 right-6">
-                <h2 className="text-2xl font-bold mb-2 text-foreground">Tell Us About Your Style</h2>
-                <p className="text-muted-foreground mb-4">
-                  Take our personalized quiz to discover your unique style preferences and get tailored recommendations
+              
+              <div className="absolute bottom-8 left-8 right-8 text-white">
+                <div className="flex items-center mb-3">
+                  <Sparkles className="w-6 h-6 mr-2 text-accent" />
+                  <span className="text-sm font-medium uppercase tracking-wider text-accent">Personalized</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-3 group-hover:text-accent transition-colors duration-300">
+                  Tell Us About Your Style
+                </h2>
+                <p className="text-white/90 mb-6 leading-relaxed">
+                  Take our expertly crafted quiz to discover your unique design preferences and get tailored recommendations that match your personality
                 </p>
                 <Button 
                   onClick={onStyleQuiz}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm transition-all duration-300 h-12 text-lg font-semibold hover:scale-105"
                 >
-                  Start Style Quiz
+                  Discover Your Style
                 </Button>
               </div>
             </div>
           </Card>
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-sm text-muted-foreground">
-            Both paths lead to personalized furniture recommendations just for you
-          </p>
+        <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 max-w-2xl mx-auto">
+            <p className="text-muted-foreground mb-2 text-lg">
+              ✨ Both paths lead to personalized furniture recommendations
+            </p>
+            <p className="text-sm text-muted-foreground/80">
+              Powered by advanced AI • Curated by design experts • Tailored just for you
+            </p>
+          </div>
         </div>
       </div>
     </div>
