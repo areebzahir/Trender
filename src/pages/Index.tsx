@@ -1,14 +1,61 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { LandingPage } from "@/components/LandingPage";
+import { RoomUpload } from "@/components/RoomUpload";
+import { SwipeInterface } from "@/components/SwipeInterface";
+
+type AppState = 'landing' | 'upload' | 'swipe';
+
+interface RoomData {
+  image: File | null;
+  preferences: string;
+  specific?: string;
+}
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [currentState, setCurrentState] = useState<AppState>('landing');
+  const [roomData, setRoomData] = useState<RoomData | null>(null);
+
+  const handleGetStarted = () => {
+    setCurrentState('upload');
+  };
+
+  const handleRoomUpload = (data: RoomData) => {
+    setRoomData(data);
+    setCurrentState('swipe');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentState('landing');
+    setRoomData(null);
+  };
+
+  const handleBackToUpload = () => {
+    setCurrentState('upload');
+  };
+
+  if (currentState === 'landing') {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  if (currentState === 'upload') {
+    return (
+      <RoomUpload 
+        onContinue={handleRoomUpload}
+        onBack={handleBackToLanding}
+      />
+    );
+  }
+
+  if (currentState === 'swipe' && roomData) {
+    return (
+      <SwipeInterface 
+        onBack={handleBackToUpload}
+        roomData={roomData}
+      />
+    );
+  }
+
+  return <LandingPage onGetStarted={handleGetStarted} />;
 };
 
 export default Index;
