@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
+import { ChoicePage } from "@/components/ChoicePage";
 import { RoomUpload } from "@/components/RoomUpload";
 import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
 import { StyleQuiz } from "@/components/StyleQuiz";
 
-type AppState = 'landing' | 'upload' | 'quiz' | 'swipe';
+type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'swipe';
 
 interface RoomData {
   image: File | null;
@@ -18,7 +19,7 @@ const Index = () => {
   const [roomData, setRoomData] = useState<RoomData | null>(null);
 
   const handleGetStarted = () => {
-    setCurrentState('upload');
+    setCurrentState('choice');
   };
 
   const handleRoomUpload = (data: RoomData) => {
@@ -44,15 +45,37 @@ const Index = () => {
     setCurrentState('quiz');
   };
 
+  const handleRoomDecorating = () => {
+    setCurrentState('upload');
+  };
+
+  const handleStyleQuiz = () => {
+    setCurrentState('quiz');
+  };
+
+  const handleBackToChoice = () => {
+    setCurrentState('choice');
+  };
+
   if (currentState === 'landing') {
     return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  if (currentState === 'choice') {
+    return (
+      <ChoicePage 
+        onBack={handleBackToLanding}
+        onRoomDecorating={handleRoomDecorating}
+        onStyleQuiz={handleStyleQuiz}
+      />
+    );
   }
 
   if (currentState === 'upload') {
     return (
       <RoomUpload 
         onContinue={handleRoomUpload}
-        onBack={handleBackToLanding}
+        onBack={handleBackToChoice}
       />
     );
   }
@@ -61,7 +84,7 @@ const Index = () => {
     return (
       <StyleQuiz
         onComplete={handleQuizComplete}
-        onBack={handleBackToUpload}
+        onBack={handleBackToChoice}
       />
     );
   }
