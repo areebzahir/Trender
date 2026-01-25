@@ -50,13 +50,13 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         />
         <div className="relative z-10 container mx-auto px-4 py-20 text-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 animate-float">
+            <h1 className="font-display text-6xl md:text-8xl font-bold text-white mb-6 animate-float tracking-tight">
               Trender
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-4 font-light">
+            <p className="font-body text-xl md:text-2xl text-white/90 mb-4 font-light tracking-wide">
               AI Furniture Expert
             </p>
-            <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-body text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
               Discover furniture that matches your unique style. Upload your room, swipe through 
               AI-curated pieces, and create the perfect space you've always dreamed of.
             </p>
@@ -64,7 +64,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
               variant="hero" 
               size="lg" 
               onClick={onGetStarted}
-              className="text-lg px-8 py-4 group"
+              className="font-body text-lg px-8 py-4 group font-medium"
             >
               Start Matching Furniture
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -77,10 +77,10 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
       <section className="py-20 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
               How Trender Works
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="font-body text-xl text-muted-foreground max-w-2xl mx-auto">
               Your personal AI stylist that learns your taste and finds furniture you'll love
             </p>
           </div>
@@ -96,10 +96,10 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
+                <h3 className="font-body text-lg font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="font-body text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
               </Card>
@@ -113,10 +113,10 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-foreground mb-6">
+              <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
                 Discover Your Perfect Style
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              <p className="font-body text-lg text-muted-foreground mb-8 leading-relaxed">
                 Our AI-powered platform uses advanced taste profiling to understand your unique 
                 aesthetic preferences. From minimalist modern to cozy bohemian, we'll help you 
                 discover furniture that truly reflects who you are.
@@ -124,22 +124,22 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
               <div className="flex flex-wrap gap-4 mb-8">
                 <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
                   <Zap className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">AI-Powered</span>
+                  <span className="font-body text-sm font-medium">AI-Powered</span>
                 </div>
                 <div className="flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full">
                   <Palette className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium">Style Analysis</span>
+                  <span className="font-body text-sm font-medium">Style Analysis</span>
                 </div>
                 <div className="flex items-center gap-2 bg-secondary/20 px-4 py-2 rounded-full">
                   <Heart className="w-4 h-4 text-secondary-foreground" />
-                  <span className="text-sm font-medium">Personalized</span>
+                  <span className="font-body text-sm font-medium">Personalized</span>
                 </div>
               </div>
               <Button 
                 variant="warm" 
                 size="lg"
                 onClick={onGetStarted}
-                className="group"
+                className="font-body group font-medium"
               >
                 Try It Now
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -161,17 +161,17 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
       <section className="py-20 bg-gradient-primary relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/10"></div>
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="font-display text-4xl md:text-6xl font-bold text-white mb-6">
             Ready to Find Your Perfect Furniture?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="font-body text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of users who've discovered their ideal home aesthetic with Trender
           </p>
           <Button 
             variant="secondary" 
             size="lg"
             onClick={onGetStarted}
-            className="text-lg px-8 py-4 group bg-white/90 hover:bg-white hover:scale-105"
+            className="font-body text-lg px-8 py-4 group bg-white/90 hover:bg-white hover:scale-105 font-medium"
           >
             Start Your Style Journey
             <Sparkles className="ml-2 group-hover:rotate-12 transition-transform" />

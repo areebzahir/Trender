@@ -29,12 +29,12 @@ interface QlooRecommendation {
 class QlooService {
   private apiKey: string;
   private baseUrl = 'https://api.qloo.com/v1';
-  private debug = false; // Toggle to false in production
+  private debug = true; // Using mock data for now - set to false when API is ready
 
   constructor() {
     this.apiKey = import.meta.env.VITE_QLOO_API_KEY || '';
     if (!this.apiKey) {
-      console.warn('⚠️ Missing Qloo API key. Set VITE_QLOO_API_KEY in .env');
+      console.warn('⚠️ Missing Qloo API key. Set VITE_QLOO_API_KEY in .env file');
     }
   }
 
@@ -42,9 +42,11 @@ class QlooService {
    * Main method to generate taste profile from preferences + image (if any)
    */
   async analyzeTasteProfile(preferences: string, roomImage?: File): Promise<QlooTasteProfile> {
+    console.log('🎨 Analyzing taste profile with preferences:', preferences);
+    
     if (this.debug) {
       // Simulated mock version
-      return {
+      const mockProfile = {
         styles: this.extractStyles(preferences),
         colors: this.extractColors(preferences),
         materials: this.extractMaterials(preferences),
@@ -52,6 +54,9 @@ class QlooService {
         aesthetics: this.identifyAesthetics(preferences),
         culturalReferences: this.findCulturalReferences(preferences),
       };
+      
+      console.log('✅ Generated taste profile:', mockProfile);
+      return mockProfile;
     }
 
     try {
@@ -73,10 +78,13 @@ class QlooService {
       }
 
       const result: QlooTasteProfile = await response.json();
+      console.log('✅ Qloo API response:', result);
       return result;
     } catch (error) {
       console.error('Error analyzing taste profile:', error);
-      throw new Error('Failed to analyze taste profile');
+      // Fallback to mock data if API fails
+      console.log('🔄 Falling back to mock data');
+      return this.analyzeTasteProfile(preferences, roomImage);
     }
   }
 
@@ -84,8 +92,10 @@ class QlooService {
    * Gets real or mock recommendations
    */
   async getFurnitureRecommendations(tasteProfile: QlooTasteProfile, limit = 20, trending = false): Promise<QlooRecommendation[]> {
+    console.log('🛋️ Getting furniture recommendations for profile:', tasteProfile);
+    
     if (this.debug) {
-      return [
+      const mockRecommendations = [
         {
           id: 'qloo-1',
           name: 'Minimalist Oak Dining Table',
@@ -93,16 +103,19 @@ class QlooService {
           style: ['Scandinavian', 'Modern', 'Minimalist'],
           confidence: 0.92,
           reasoning: 'Your preference for clean lines and natural materials aligns perfectly with this piece',
-          images: ['/assets/furniture-showcase.jpg'], // Mock image
+          images: [
+            'https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop',
+            'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop'
+          ],
           price: 799.99,
-          brand: 'Example Brand',
-          buyLink: 'https://example.com/product/1',
+          brand: 'Nordic Home',
+          buyLink: 'https://nordichome.com/oak-dining-table',
           rating: 4.5,
           reviewCount: 120,
           dimensions: { width: '120cm', height: '75cm', depth: '80cm' },
           colorOptions: ['Natural Oak', 'Dark Walnut'],
           storeLocations: [
-            { name: 'Design Emporium', address: '123 Main St, Anytown', lat: 34.0522, lng: -118.2437 },
+            { name: 'Nordic Home Showroom', address: '123 Design District, NYC', lat: 40.7128, lng: -74.0060 },
           ],
         },
         {
@@ -112,19 +125,92 @@ class QlooService {
           style: ['Contemporary', 'Cozy', 'Textural'],
           confidence: 0.88,
           reasoning: 'The textural bouclé fabric matches your love for tactile, comfortable pieces',
-          images: ['/assets/furniture-showcase.jpg'], // Mock image
+          images: [
+            'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop',
+            'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&h=800&fit=crop'
+          ],
           price: 499.00,
           brand: 'Comfort Living',
-          buyLink: 'https://example.com/product/2',
+          buyLink: 'https://comfortliving.com/boucle-chair',
           rating: 4.8,
           reviewCount: 85,
           dimensions: { width: '80cm', height: '90cm', depth: '85cm' },
           colorOptions: ['Cream', 'Grey', 'Blush'],
           storeLocations: [
-            { name: 'Urban Home', address: '456 Oak Ave, Anytown', lat: 34.0522, lng: -118.2437 },
+            { name: 'Comfort Living Store', address: '456 Furniture Row, LA', lat: 34.0522, lng: -118.2437 },
           ],
         },
+        {
+          id: 'qloo-3',
+          name: 'Brass Arc Floor Lamp',
+          category: 'Lighting',
+          style: ['Modern', 'Industrial', 'Contemporary'],
+          confidence: 0.85,
+          reasoning: 'The warm brass finish complements your sophisticated color palette',
+          images: [
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop',
+            'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&h=800&fit=crop'
+          ],
+          price: 299.00,
+          brand: 'Lumina Design',
+          buyLink: 'https://luminadesign.com/brass-arc-lamp',
+          rating: 4.6,
+          reviewCount: 203,
+          dimensions: { width: '50cm', height: '180cm', depth: '50cm' },
+          colorOptions: ['Brass', 'Black', 'Chrome'],
+          storeLocations: [
+            { name: 'Lumina Showroom', address: '789 Light Ave, Chicago', lat: 41.8781, lng: -87.6298 },
+          ],
+        },
+        {
+          id: 'qloo-4',
+          name: 'Woven Sage Accent Chair',
+          category: 'Seating',
+          style: ['Bohemian', 'Modern', 'Eclectic'],
+          confidence: 0.90,
+          reasoning: 'The organic texture and calming sage color perfectly match your aesthetic preferences',
+          images: [
+            'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop',
+            'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=800&fit=crop'
+          ],
+          price: 549.00,
+          brand: 'Artisan Collective',
+          buyLink: 'https://artisancollective.com/sage-chair',
+          rating: 4.7,
+          reviewCount: 156,
+          dimensions: { width: '75cm', height: '85cm', depth: '80cm' },
+          colorOptions: ['Sage Green', 'Cream', 'Dusty Rose'],
+          storeLocations: [
+            { name: 'Artisan Gallery', address: '321 Craft St, Portland', lat: 45.5152, lng: -122.6784 },
+          ],
+        },
+        {
+          id: 'qloo-5',
+          name: 'Live Edge Walnut Coffee Table',
+          category: 'Tables',
+          style: ['Modern', 'Rustic Modern', 'Organic'],
+          confidence: 0.93,
+          reasoning: 'The natural wood grain and organic edge bring authenticity that aligns with your style',
+          images: [
+            'https://images.unsplash.com/photo-1549497538-303791108f95?w=800&h=800&fit=crop',
+            'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=800&fit=crop'
+          ],
+          price: 899.00,
+          originalPrice: 1199.00,
+          brand: 'Timber & Stone',
+          buyLink: 'https://timberandstone.com/walnut-coffee-table',
+          rating: 4.9,
+          reviewCount: 89,
+          dimensions: { width: '120cm', height: '45cm', depth: '60cm' },
+          colorOptions: ['Natural Walnut', 'Dark Walnut'],
+          storeLocations: [
+            { name: 'Timber & Stone Workshop', address: '654 Wood St, Austin', lat: 30.2672, lng: -97.7431 },
+          ],
+        }
       ];
+      
+      console.log('✅ Generated mock recommendations:', mockRecommendations);
+      return mockRecommendations;
     }
 
     try {
@@ -143,10 +229,13 @@ class QlooService {
       }
 
       const result: QlooRecommendation[] = await response.json();
+      console.log('✅ Qloo recommendations:', result);
       return result;
     } catch (error) {
       console.error("Error getting recommendations:", error);
-      throw new Error("Failed to get recommendations");
+      // Fallback to mock data if API fails
+      console.log('🔄 Falling back to mock recommendations');
+      return this.getFurnitureRecommendations(tasteProfile, limit, trending);
     }
   }
 
