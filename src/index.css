@@ -191,3 +191,185 @@
     background: hsl(var(--primary) / 0.5);
   }
 }
+
+/* Glassmorphic floating panel */
+.glass-panel {
+  background: var(--gradient-card);
+  backdrop-filter: blur(36px) saturate(1.3);
+  box-shadow: 0 16px 64px 0 hsl(var(--primary) / 0.16), 0 4px 32px 0 hsl(var(--accent) / 0.10), 0 0 0 1.5px hsl(var(--primary-glow) / 0.10) inset;
+  border-radius: 3.5rem;
+  border: none;
+  position: relative;
+  overflow: visible;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: box-shadow 0.4s cubic-bezier(0.4,0,0.2,1), background 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 3.5rem;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255,255,255,0.18) 10%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0.12) 100%);
+  opacity: 0.85;
+  z-index: 1;
+  animation: glassSweep 4s linear infinite;
+}
+@keyframes glassSweep {
+  0% { opacity: 0.85; }
+  50% { opacity: 1; }
+  100% { opacity: 0.85; }
+}
+@media (min-width: 1024px) {
+  .glass-panel {
+    max-width: 420px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* Double-edge light halo, ambient border glow */
+.glow-border {
+  box-shadow: 0 0 0 4px hsl(var(--primary-glow) / 0.18), 0 0 16px 2px hsl(var(--accent) / 0.12), 0 0 0 2.5px hsl(var(--primary) / 0.13) inset;
+  border: 2.5px double transparent;
+  border-image: linear-gradient(120deg, hsl(var(--primary-glow)), hsl(var(--accent)), hsl(var(--primary))) 1;
+}
+
+/* Animated shimmer border for focused input */
+.shimmer-focus:focus-within {
+  box-shadow: 0 0 0 3px hsl(var(--primary-glow) / 0.25), 0 0 12px 2px hsl(var(--accent) / 0.10);
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer {
+  0% { box-shadow: 0 0 0 3px hsl(var(--primary-glow) / 0.25), 0 0 12px 2px hsl(var(--accent) / 0.10); }
+  50% { box-shadow: 0 0 0 6px hsl(var(--primary-glow) / 0.35), 0 0 24px 4px hsl(var(--accent) / 0.18); }
+  100% { box-shadow: 0 0 0 3px hsl(var(--primary-glow) / 0.25), 0 0 12px 2px hsl(var(--accent) / 0.10); }
+}
+
+/* Pill-shaped, glowing input with icon */
+.lux-input {
+  border-radius: 9999px;
+  background: hsl(var(--card) / 0.85);
+  border: 2px solid hsl(var(--primary) / 0.13);
+  padding-left: 2.8rem;
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: hsl(var(--foreground));
+  box-shadow: 0 2px 12px 0 hsl(var(--primary) / 0.06);
+  transition: box-shadow 0.3s, border 0.3s;
+}
+.lux-input::placeholder {
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* Glowing gradient button */
+.lux-btn {
+  border-radius: 9999px;
+  background: var(--gradient-hero);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.18rem;
+  box-shadow: 0 2px 24px 0 hsl(var(--primary-glow) / 0.22), 0 1.5px 8px 0 hsl(var(--accent) / 0.10);
+  transition: transform 0.18s, box-shadow 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.lux-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 32px 0 hsl(var(--primary-glow) / 0.32), 0 2.5px 12px 0 hsl(var(--accent) / 0.18);
+}
+.lux-btn:active {
+  transform: scale(0.98);
+}
+
+/* Title: bold, glass-embossed, gradient-reflective, animated */
+.lux-title {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, hsl(var(--primary-glow)), hsl(var(--accent)), hsl(var(--primary)) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 16px hsl(var(--primary-glow) / 0.18));
+  text-shadow: 0 1.5px 8px hsl(var(--primary-glow) / 0.13);
+  animation: luxTitleIn 0.9s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes luxTitleIn {
+  from { opacity: 0; transform: translateY(-32px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Subtitle: gradient fade, motion glow, pulse on load */
+.lux-subtitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  background: linear-gradient(90deg, #fff, hsl(var(--primary-glow) / 0.7) 80%, transparent 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1.5px 8px hsl(var(--primary-glow) / 0.13));
+  animation: luxSubtitlePulse 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes luxSubtitlePulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.85; }
+}
+
+/* Camera icon: glow, motion, animate on hover */
+.lux-camera {
+  filter: drop-shadow(0 0 12px hsl(var(--primary-glow) / 0.45));
+  transition: filter 0.3s, transform 0.3s;
+  animation: luxCameraIdle 2.2s infinite alternate;
+}
+.lux-camera:hover {
+  filter: drop-shadow(0 0 24px hsl(var(--primary-glow) / 0.75));
+  transform: scale(1.08) rotate(-6deg);
+}
+@keyframes luxCameraIdle {
+  0% { filter: drop-shadow(0 0 8px hsl(var(--primary-glow) / 0.25)); }
+  100% { filter: drop-shadow(0 0 16px hsl(var(--primary-glow) / 0.45)); }
+}
+
+/* Upload zone: animated dashed border, drag-hover animation */
+.lux-upload-zone {
+  border: 2.5px dashed hsl(var(--primary-glow) / 0.32);
+  border-radius: 1.5rem;
+  background: hsl(var(--primary) / 0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 12px 0 hsl(var(--primary) / 0.06);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.lux-upload-zone:hover, .lux-upload-zone.drag-active {
+  border-color: hsl(var(--accent));
+  box-shadow: 0 0 0 4px hsl(var(--primary-glow) / 0.18);
+}
+.lux-upload-zone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  pointer-events: none;
+  border: 2.5px dashed transparent;
+  animation: dashAnim 2.5s linear infinite;
+}
+@keyframes dashAnim {
+  0% { border-image: linear-gradient(90deg, hsl(var(--primary-glow)), hsl(var(--accent)), hsl(var(--primary))) 1; }
+  100% { border-image: linear-gradient(270deg, hsl(var(--primary-glow)), hsl(var(--accent)), hsl(var(--primary))) 1; }
+}
+
+/* Preview image: rounded, shadow, gentle glow */
+.lux-preview {
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px 0 hsl(var(--primary-glow) / 0.18);
+  border: 2.5px solid hsl(var(--primary-glow) / 0.13);
+  background: hsl(var(--card) / 0.92);
+}

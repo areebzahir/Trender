@@ -23,7 +23,7 @@ import warmLivingRoom from "@/assets/warm-living-room.jpg";
 import abstractDesign from "@/assets/abstract-design.jpg";
 
 interface RoomUploadProps {
-  onContinue: (roomData: { image: File | null; preferences: string; specific?: string }) => void;
+  onContinue: (roomData: { image: File | null; preferences: string; specific?: string; location?: string }) => void;
   onBack: () => void;
 }
 
@@ -32,9 +32,32 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [preferences, setPreferences] = useState("");
   const [specificNeeds, setSpecificNeeds] = useState("");
-  const [step, setStep] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // 1. Add location state and geolocation logic at the top of the component
+  const [location, setLocation] = useState<string>("");
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      return;
+    }
+    setIsLocating(true);
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation(`${position.coords.latitude}, ${position.coords.longitude}`);
+        setIsLocating(false);
+      },
+      (error) => {
+        setLocationError("Unable to retrieve your location.");
+        setIsLocating(false);
+      }
+    );
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -74,16 +97,14 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
     }
   };
 
+  // 3. Pass location to onContinue
   const handleContinue = () => {
-    if (step === 1) {
-      setStep(2);
-    } else {
-      onContinue({
-        image: uploadedImage,
-        preferences,
-        specific: specificNeeds
-      });
-    }
+    onContinue({
+      image: uploadedImage,
+      preferences,
+      specific: specificNeeds,
+      location
+    });
   };
 
   const quickStyleOptions = [
@@ -94,180 +115,6 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
     "Traditional",
     "Eclectic"
   ];
-
-  if (step === 2) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
-        {/* Background Images */}
-        <div className="absolute inset-0">
-          <div 
-            className="absolute top-0 left-0 w-1/3 h-full bg-cover bg-center opacity-10"
-            style={{ backgroundImage: `url(${warmLivingRoom})` }}
-          />
-          <div 
-            className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center opacity-10"
-            style={{ backgroundImage: `url(${abstractDesign})` }}
-          />
-        </div>
-
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-40 right-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/20 rounded-full blur-2xl"></div>
-        </div>
-
-        <div className="container mx-auto px-4 py-8 relative z-10">
-          <Button 
-            variant="ghost" 
-            onClick={onBack}
-            className="mb-8 text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 mb-6">
-                <motion.div 
-                  className="flex items-center justify-center mb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
-                    <Wand2 className="w-8 h-8 text-primary mr-3" />
-                  </motion.div>
-                  <h1 className="text-5xl font-bold text-foreground drop-shadow-lg">Tell Us About Your Style</h1>
-                  <motion.div animate={{ rotate: -360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
-                    <Wand2 className="w-8 h-8 text-primary ml-3" />
-                  </motion.div>
-                </motion.div>
-                <p className="text-xl text-muted-foreground leading-relaxed">
-                  Help us understand your design preferences so we can suggest the perfect furniture for your space
-                </p>
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <Card className="border-2 border-primary/20 bg-card/80 backdrop-blur-md shadow-2xl">
-                <div className="p-8">
-                  {/* Quick Style Options */}
-                  <motion.div 
-                    className="mb-8"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                  >
-                    <h3 className="text-lg font-semibold mb-4 text-foreground flex items-center">
-                      <Sparkles className="w-5 h-5 mr-2 text-primary" />
-                      Quick Style Selection
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                      {quickStyleOptions.map((style) => (
-                        <motion.div
-                          key={style}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                        >
-                          <Button
-                            variant={preferences.includes(style) ? "default" : "outline"}
-                            onClick={() => {
-                              setPreferences(prev => 
-                                prev.includes(style) 
-                                  ? prev.split(", ").filter(p => p !== style).join(", ")
-                                  : prev ? `${prev}, ${style}` : style
-                              );
-                            }}
-                            className="transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-warm"
-                          >
-                            {style}
-                          </Button>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-
-                  {/* Custom preferences */}
-                  <motion.div 
-                    className="mb-8"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                  >
-                    <label className="block text-sm font-medium mb-3 text-foreground flex items-center">
-                      <Home className="w-4 h-4 mr-2 text-primary" />
-                      Describe your ideal style and preferences
-                    </label>
-                    <Textarea
-                      value={preferences}
-                      onChange={(e) => setPreferences(e.target.value)}
-                      placeholder="I love modern minimalist designs with clean lines and neutral colors..."
-                      className="min-h-[120px] bg-background/70 backdrop-blur-sm border-border/50 focus:border-primary transition-all duration-300 shadow-soft focus:shadow-warm"
-                    />
-                  </motion.div>
-
-                  {/* Specific needs */}
-                  <motion.div 
-                    className="mb-8"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                  >
-                    <label className="block text-sm font-medium mb-3 text-foreground flex items-center">
-                      <Camera className="w-4 h-4 mr-2 text-primary" />
-                      Any specific needs or requirements?
-                    </label>
-                    <Textarea
-                      value={specificNeeds}
-                      onChange={(e) => setSpecificNeeds(e.target.value)}
-                      placeholder="Pet-friendly materials, storage solutions, budget considerations..."
-                      className="min-h-[100px] bg-background/70 backdrop-blur-sm border-border/50 focus:border-primary transition-all duration-300 shadow-soft focus:shadow-warm"
-                    />
-                  </motion.div>
-
-                  <motion.div 
-                    className="flex justify-between items-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 1.0 }}
-                  >
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setStep(1)}
-                        className="transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-warm"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back to Photo
-                      </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button 
-                        onClick={handleContinue}
-                        disabled={!preferences.trim()}
-                        variant="hero"
-                        className="disabled:opacity-50 disabled:hover:scale-100"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Start Discovering Furniture
-                      </Button>
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 relative overflow-hidden">
@@ -341,7 +188,6 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                     <ImageIcon className="w-5 h-5 mr-2 text-primary" />
                     Room Photo
                   </Label>
-                  
                   {!imagePreview ? (
                     <motion.div 
                       className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer bg-primary/5 backdrop-blur-sm"
@@ -400,7 +246,6 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                       </motion.div>
                     </motion.div>
                   )}
-                  
                   <Input
                     ref={fileInputRef}
                     type="file"
@@ -410,43 +255,64 @@ export const RoomUpload = ({ onContinue, onBack }: RoomUploadProps) => {
                   />
                 </motion.div>
 
-                {/* Tips */}
-                <motion.div 
-                  className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8 backdrop-blur-sm"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                >
-                  <h3 className="font-medium text-foreground mb-2 flex items-center">
-                    <Sparkles className="w-4 h-4 mr-2 text-primary" />
-                    Photo Tips
-                  </h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Good lighting helps our AI better analyze your space</li>
-                    <li>• Include existing furniture and decor in the shot</li>
-                    <li>• A wide angle showing the full room works best</li>
-                  </ul>
-                </motion.div>
+                {/* Prompt Field (new feature, keep) */}
+                <div className="relative mb-5">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"><Sparkles className="w-5 h-5" /></span>
+                  <Input
+                    type="text"
+                    value={preferences}
+                    onChange={e => setPreferences(e.target.value)}
+                    placeholder="Describe the furniture you're looking for in this room..."
+                    className="pl-12 pr-4 py-3 rounded-xl border border-primary/20 bg-white/60 focus:ring-2 focus:ring-primary/30 transition-all text-lg placeholder:text-muted-foreground"
+                    maxLength={200}
+                  />
+                </div>
 
-                {/* Action Buttons */}
-                <motion.div 
-                  className="flex justify-end items-center"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
-                >
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button 
-                      onClick={handleContinue}
-                      disabled={!uploadedImage}
-                      variant="hero"
-                      className="disabled:opacity-50 disabled:hover:scale-100"
+                {/* Location Field + Detect Button (new feature, keep) */}
+                <div className="flex gap-2 items-center mb-7">
+                  <div className="relative flex-1">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"><Target className="w-5 h-5" /></span>
+                    <Input
+                      type="text"
+                      value={location}
+                      onChange={e => setLocation(e.target.value)}
+                      placeholder="Enter your city, zip, or address (optional)"
+                      className="pl-12 pr-4 py-3 rounded-xl border border-primary/20 bg-white/60 focus:ring-2 focus:ring-primary/30 transition-all text-base flex-1"
+                      maxLength={100}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDetectLocation}
+                    disabled={isLocating}
+                    className="transition-all"
+                  >
+                    {isLocating ? 'Locating...' : 'Detect'}
+                  </Button>
+                </div>
+                {locationError && <div className="text-xs text-destructive mt-1 mb-2">{locationError}</div>}
+
+                {/* Continue Button (improved CTA, keep) */}
+                <div className="flex justify-center mt-2">
+                  <Button
+                    onClick={handleContinue}
+                    disabled={!uploadedImage || !preferences.trim()}
+                    variant="hero"
+                    className="disabled:opacity-50 disabled:hover:scale-100 px-8 py-3 flex items-center gap-2 group text-lg font-bold shadow-xl"
+                  >
+                    Continue
+                    <motion.span
+                      initial={{ x: 0 }}
+                      whileHover={{ x: 10 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
+                      className="inline-block"
                     >
-                      Continue
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </motion.div>
-                </motion.div>
+                      <ArrowRight className="w-6 h-6 ml-1 transition-transform duration-200 group-hover:translate-x-2" />
+                    </motion.span>
+                  </Button>
+                </div>
               </div>
             </Card>
           </motion.div>
