@@ -38,6 +38,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 2299,
     originalPrice: 2599,
     images: [
+      "/lovable-uploads/leane12.png",
       "/lovable-uploads/leane1 (1).jpg",
       "/lovable-uploads/leane1 (2).jpg",
       "/lovable-uploads/leane1 (3).jpg",
@@ -71,6 +72,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 2362,
     originalPrice: 3149,
     images: [
+      "/lovable-uploads/6th.png",
       "/lovable-uploads/CB2 (1).jpg",
       "/lovable-uploads/CB2 (2).jpg",
       "/lovable-uploads/CB2 (3).jpg",
@@ -104,6 +106,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 3899,
     originalPrice: 3899,
     images: [
+      "/lovable-uploads/2d.png",
       "/lovable-uploads/ALB1 (1).jpg",
       "/lovable-uploads/ALB1 (2).jpg",
       "/lovable-uploads/ALB1 (3).jpg",
@@ -137,6 +140,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 1549,
     originalPrice: 2049,
     images: [
+      "/lovable-uploads/e3.png",
       "/lovable-uploads/ikea (1).avif",
       "/lovable-uploads/ikea (2).avif",
       "/lovable-uploads/ikea (3).avif",
@@ -170,6 +174,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 15799,
     originalPrice: 15799,
     images: [
+      "/lovable-uploads/4thy.png",
       "/lovable-uploads/cra1 (1).jpg",
       "/lovable-uploads/cra1 (2).jpg",
       "/lovable-uploads/cra1 (3).jpg",
@@ -203,6 +208,7 @@ export const sampleFurniture: FurnitureItem[] = [
     price: 8499,
     originalPrice: 8499,
     images: [
+      "/lovable-uploads/3rd.png",
       "/lovable-uploads/fba  (1).jpg",
       "/lovable-uploads/fba  (2).jpg",
       "/lovable-uploads/fba  (3).jpg",
