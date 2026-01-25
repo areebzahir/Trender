@@ -17,6 +17,9 @@ import {
   ShoppingCart,
   Zap
 } from "lucide-react";
+import { ImageCarousel } from "./ImageCarousel";
+import { ColorPalette } from "./ColorPalette";
+import { ProductDetailModal } from "./ProductDetailModal";
 import { sampleFurniture, type FurnitureItem } from "@/data/sampleFurniture";
 import { useToast } from "@/hooks/use-toast";
 import { TasteProfileDashboard } from "./TasteProfileDashboard";
@@ -43,6 +46,7 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
   const [showProfile, setShowProfile] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [showVisualization, setShowVisualization] = useState(false);
+  const [showProductDetail, setShowProductDetail] = useState(false);
   const [tasteProfile, setTasteProfile] = useState<QlooTasteProfile | null>(null);
   const [currentExplanation, setCurrentExplanation] = useState<GPTExplanation | null>(null);
   const [currentVisualization, setCurrentVisualization] = useState<RoomVisualization | null>(null);
@@ -453,10 +457,10 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
               {matches.map((item) => (
                 <Card key={item.id} className="overflow-hidden hover:shadow-warm transition-shadow">
                   <div className="aspect-square overflow-hidden">
-                    <img 
-                      src={item.image} 
+                    <ImageCarousel 
+                      images={item.images} 
                       alt={item.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      className="w-full h-full"
                     />
                   </div>
                   <div className="p-4">
@@ -548,26 +552,32 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
             }}
             onMouseDown={handleMouseDown}
           >
-            {/* Image */}
+            {/* Image Carousel */}
             <div className="relative h-2/3 overflow-hidden">
-              <img 
-                src={currentItem.image} 
+              <ImageCarousel 
+                images={currentItem.images} 
                 alt={currentItem.name}
-                className="w-full h-full object-cover"
-                draggable={false}
+                className="w-full h-full"
               />
               <div className="absolute top-4 right-4">
                 <Badge variant="secondary" className="bg-card/80 backdrop-blur-sm">
                   {currentItem.category}
                 </Badge>
               </div>
-              <div className="absolute top-4 left-4">
+              <div className="absolute top-4 left-4 flex gap-2">
                 <Button
                   size="sm"
                   variant="swipe"
                   onClick={handleShowExplanation}
                 >
                   <Info className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="swipe"
+                  onClick={() => setShowProductDetail(true)}
+                >
+                  <Eye className="w-4 h-4" />
                 </Button>
               </div>
             </div>
@@ -577,7 +587,12 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
               <div>
                 <h2 className="text-xl font-bold text-foreground">{currentItem.name}</h2>
                 <p className="text-muted-foreground">{currentItem.brand}</p>
-                <p className="text-2xl font-bold text-primary mt-1">${currentItem.price}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-2xl font-bold text-primary">${currentItem.price}</p>
+                  {currentItem.originalPrice && (
+                    <p className="text-lg text-muted-foreground line-through">${currentItem.originalPrice}</p>
+                  )}
+                </div>
               </div>
 
               {currentItem.whyMatch && (
@@ -589,19 +604,26 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
                 </div>
               )}
 
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-current text-accent" />
-                  {currentItem.rating}
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-current text-accent" />
+                    {currentItem.rating} ({currentItem.reviewCount})
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Ruler className="w-4 h-4" />
+                    {currentItem.dimensions.width} W
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Palette className="w-4 h-4" />
+                    {currentItem.colorOptions.length} colors
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Ruler className="w-4 h-4" />
-                  {currentItem.dimensions.width} W
-                </div>
-                <div className="flex items-center gap-1">
-                  <Palette className="w-4 h-4" />
-                  {currentItem.colors.length} colors
-                </div>
+
+                <ColorPalette 
+                  colors={currentItem.colorOptions}
+                  showImages={false}
+                />
               </div>
             </div>
           </Card>
@@ -643,6 +665,22 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
           </p>
         </div>
       </div>
+
+      {/* Product Detail Modal */}
+      {showProductDetail && (
+        <ProductDetailModal
+          item={currentItem}
+          onClose={() => setShowProductDetail(false)}
+          onLike={() => handleSwipe('right')}
+          onBuy={() => {
+            toast({
+              title: "Redirecting to Store",
+              description: `Taking you to purchase ${currentItem.name}`,
+            });
+            window.open(currentItem.buyLink, '_blank');
+          }}
+        />
+      )}
     </div>
   );
 };

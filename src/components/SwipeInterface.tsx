@@ -147,7 +147,7 @@ export const SwipeInterface = ({ onBack, roomData }: SwipeInterfaceProps) => {
                 <Card key={item.id} className="overflow-hidden hover:shadow-warm transition-shadow">
                   <div className="aspect-square overflow-hidden">
                     <img 
-                      src={item.image} 
+                      src={item.images[0]} 
                       alt={item.name}
                       className="w-full h-full object-cover hover:scale-105 transition-transform"
                     />
@@ -222,7 +222,7 @@ export const SwipeInterface = ({ onBack, roomData }: SwipeInterfaceProps) => {
             {/* Image */}
             <div className="relative h-2/3 overflow-hidden">
               <img 
-                src={currentItem.image} 
+                src={currentItem.images[0]} 
                 alt={currentItem.name}
                 className="w-full h-full object-cover"
                 draggable={false}
@@ -262,7 +262,7 @@ export const SwipeInterface = ({ onBack, roomData }: SwipeInterfaceProps) => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Palette className="w-4 h-4" />
-                  {currentItem.colors.length} colors
+                  {currentItem.colorOptions.length} colors
                 </div>
               </div>
             </div>

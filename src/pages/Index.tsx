@@ -2,13 +2,15 @@ import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
 import { RoomUpload } from "@/components/RoomUpload";
 import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
+import { StyleQuiz } from "@/components/StyleQuiz";
 
-type AppState = 'landing' | 'upload' | 'swipe';
+type AppState = 'landing' | 'upload' | 'quiz' | 'swipe';
 
 interface RoomData {
   image: File | null;
   preferences: string;
   specific?: string;
+  quizResults?: Record<string, string>;
 }
 
 const Index = () => {
@@ -21,6 +23,11 @@ const Index = () => {
 
   const handleRoomUpload = (data: RoomData) => {
     setRoomData(data);
+    setCurrentState('quiz');
+  };
+
+  const handleQuizComplete = (results: Record<string, string>) => {
+    setRoomData(prev => prev ? { ...prev, quizResults: results } : null);
     setCurrentState('swipe');
   };
 
@@ -31,6 +38,10 @@ const Index = () => {
 
   const handleBackToUpload = () => {
     setCurrentState('upload');
+  };
+
+  const handleBackToQuiz = () => {
+    setCurrentState('quiz');
   };
 
   if (currentState === 'landing') {
@@ -46,10 +57,19 @@ const Index = () => {
     );
   }
 
+  if (currentState === 'quiz' && roomData) {
+    return (
+      <StyleQuiz
+        onComplete={handleQuizComplete}
+        onBack={handleBackToUpload}
+      />
+    );
+  }
+
   if (currentState === 'swipe' && roomData) {
     return (
       <EnhancedSwipeInterface 
-        onBack={handleBackToUpload}
+        onBack={handleBackToQuiz}
         roomData={roomData}
       />
     );
