@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
 import { RoomUpload } from "@/components/RoomUpload";
-import { SwipeInterface } from "@/components/SwipeInterface";
+import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
 
 type AppState = 'landing' | 'upload' | 'swipe';
 
@@ -48,7 +48,7 @@ const Index = () => {
 
   if (currentState === 'swipe' && roomData) {
     return (
-      <SwipeInterface 
+      <EnhancedSwipeInterface 
         onBack={handleBackToUpload}
         roomData={roomData}
       />
