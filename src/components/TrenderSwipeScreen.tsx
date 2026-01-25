@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { Heart, X, Star, ChevronUp, ChevronDown, RotateCcw, ExternalLink, ShoppingCart, Share2, ArrowLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
+import { Heart, X, Info, ArrowLeft, Sparkles, Eye, ShoppingBag, Box } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { useWishlistStore, WishlistItem } from './WishlistStore';
 import { sampleFurniture } from '@/data/sampleFurniture';
 
@@ -22,25 +21,58 @@ interface TrenderSwipeScreenProps {
 
 const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToEnhancedSwipe, roomData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState(0);
-  const [interestScore, setInterestScore] = useState(0);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+  const [showMatchReason, setShowMatchReason] = useState(false);
+  const [cards, setCards] = useState(sampleFurniture.slice(0, 3));
   const { add: addToWishlist } = useWishlistStore();
 
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-25, 25]);
-  const opacity = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
+  const y = useMotionValue(0);
+  const scale = useTransform(x, [-300, 0, 300], [0.8, 1, 0.8]);
+  const rotate = useTransform(x, [-300, 0, 300], [-15, 0, 15]);
+  const opacity = useTransform(x, [-300, -150, 0, 150, 300], [0, 0.5, 1, 0.5, 0]);
 
+  const controls = useAnimation();
   const constraintsRef = useRef(null);
 
-  const currentItem = sampleFurniture[currentIndex];
+  const currentItem = cards[0] || sampleFurniture[currentIndex];
+
+  // Auto-show match reason after 2 seconds of viewing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMatchReason(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [currentIndex]);
+
+  // Preload next cards
+  useEffect(() => {
+    const nextCards = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentIndex + i) % sampleFurniture.length;
+      nextCards.push(sampleFurniture[index]);
+    }
+    setCards(nextCards);
+  }, [currentIndex]);
 
   if (!currentItem) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-orange-900 mb-4">That's all for now!</h2>
-          <Button onClick={onBack} className="bg-gradient-to-r from-orange-500 to-amber-500">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="mb-6"
+          >
+            <Sparkles className="w-16 h-16 mx-auto text-indigo-500 mb-4" />
+            <h2 className="text-3xl font-bold text-slate-800 mb-2">All Done!</h2>
+            <p className="text-slate-600">You've discovered all our premium pieces</p>
+          </motion.div>
+          <Button
+            onClick={onBack}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-2xl font-medium shadow-lg"
+          >
             Back to Home
           </Button>
         </div>
@@ -49,23 +81,25 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   }
 
   const handleDragEnd = (event: any, info: PanInfo) => {
-    const threshold = 150;
+    const threshold = 120;
+    const velocity = info.velocity.x;
 
-    if (info.offset.x > threshold) {
-      // Swipe right - Add to wishlist
-      handleLike();
-    } else if (info.offset.x < -threshold) {
-      // Swipe left - Skip
-      handleSkip();
-    } else if (info.offset.y < -100) {
-      // Swipe up - Style Match
-      handleStyleMatch();
-    } else if (info.offset.y > 100) {
-      // Swipe down - Show details
-      setIsDetailView(true);
+    if (Math.abs(info.offset.x) > threshold || Math.abs(velocity) > 500) {
+      if (info.offset.x > 0 || velocity > 0) {
+        // Swipe right - Like
+        handleLike();
+      } else {
+        // Swipe left - Pass
+        handlePass();
+      }
     } else {
-      // Reset position
-      x.set(0);
+      // Snap back to center
+      controls.start({
+        x: 0,
+        y: 0,
+        rotate: 0,
+        transition: { type: "spring", stiffness: 300, damping: 30 }
+      });
     }
   };
 
@@ -82,263 +116,366 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
     };
 
     addToWishlist(wishlistItem);
-    nextCard();
+
+    // Animate card out to the right
+    controls.start({
+      x: 400,
+      rotate: 20,
+      opacity: 0,
+      transition: { duration: 0.3, ease: "easeOut" }
+    }).then(() => {
+      nextCard();
+    });
   };
 
-  const handleSkip = () => {
-    nextCard();
-  };
-
-  const handleStyleMatch = () => {
-    // Instant buy/style match action
-    console.log('Style Match!', currentItem.name);
-    nextCard();
+  const handlePass = () => {
+    // Animate card out to the left
+    controls.start({
+      x: -400,
+      rotate: -20,
+      opacity: 0,
+      transition: { duration: 0.3, ease: "easeOut" }
+    }).then(() => {
+      nextCard();
+    });
   };
 
   const nextCard = () => {
-    x.set(0);
-    setIsDetailView(false);
-    setSelectedVariant(0);
     setCurrentIndex(prev => prev + 1);
-    setInterestScore(0);
+    setShowDetails(false);
+    setSelectedColorIndex(0);
+    setShowMatchReason(false);
+
+    // Reset card position for next card
+    x.set(0);
+    y.set(0);
+    controls.set({ x: 0, y: 0, rotate: 0, opacity: 1 });
   };
 
   const calculateMatchScore = () => {
-    return Math.floor(Math.random() * 20) + 80; // 80-99% match
+    return Math.floor(Math.random() * 15) + 85; // 85-99% match for premium feel
   };
 
-  const incrementInterest = () => {
-    setInterestScore(prev => Math.min(prev + 10, 100));
+  const getMatchReason = () => {
+    const reasons = [
+      "Matches your modern minimalist style",
+      "Perfect for your living room size",
+      "Complements your neutral color palette",
+      "Fits your contemporary aesthetic",
+      "Ideal for your space layout",
+      "Aligns with your comfort preferences"
+    ];
+    return reasons[Math.floor(Math.random() * reasons.length)];
   };
 
-  const getDimensionsString = (dimensions: any): string => {
-    if (typeof dimensions === 'string') {
-      return dimensions;
-    }
-    if (dimensions && typeof dimensions === 'object') {
-      return `${dimensions.width || ''} x ${dimensions.height || ''} x ${dimensions.depth || ''}`.trim();
-    }
-    return 'N/A';
-  };
-
-  const getColorValue = (color: any): string => {
-    if (typeof color === 'string') {
-      if (color.toLowerCase().includes('white')) return '#ffffff';
-      if (color.toLowerCase().includes('black')) return '#000000';
-      if (color.toLowerCase().includes('brown')) return '#8B4513';
-      if (color.toLowerCase().includes('gray') || color.toLowerCase().includes('grey')) return '#808080';
-      return '#D3D3D3';
-    }
-    if (color && typeof color === 'object' && color.hex) {
-      return color.hex;
-    }
-    return '#D3D3D3';
+  const getAvailableColors = () => {
+    const colors = currentItem.colorOptions || [
+      { name: 'Charcoal', hex: '#36454F' },
+      { name: 'Cream', hex: '#F5F5DC' },
+      { name: 'Mocha', hex: '#967969' }
+    ];
+    return Array.isArray(colors) ? colors.map(color => ({ name: color.name, value: color.hex })) : [colors];
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 relative overflow-hidden">
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-50 p-4 flex items-center justify-between bg-white/80 backdrop-blur-md">
-        <Button
-          variant="ghost"
-          size="sm"
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+      {/* Floating Header */}
+      <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
+        <motion.button
           onClick={onBack}
-          className="text-orange-700 hover:bg-orange-100"
+          className="p-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 hover:bg-white/90 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-orange-900">Trender</h1>
-          <p className="text-xs text-orange-600">{currentIndex + 1} of {sampleFurniture.length}</p>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
+          <ArrowLeft className="w-5 h-5 text-slate-700" />
+        </motion.button>
+
+        <motion.div
+          className="flex-1 text-center px-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h1 className="text-xl font-bold text-slate-800">Discover</h1>
+          <p className="text-xs text-slate-500 mt-1">{currentIndex + 1} of {sampleFurniture.length}</p>
+        </motion.div>
+
+        <motion.button
           onClick={onGoToEnhancedSwipe}
-          className="text-orange-700 hover:bg-orange-100"
+          className="p-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 hover:bg-white/90 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          Wishlist
-        </Button>
+          <ShoppingBag className="w-5 h-5 text-slate-700" />
+        </motion.button>
       </div>
 
-      {/* Main Card Container */}
-      <div ref={constraintsRef} className="flex items-center justify-center min-h-screen p-4 pt-20">
-        <motion.div
-          className="relative w-full max-w-sm"
-          style={{ x, rotate, opacity }}
-          drag
-          dragConstraints={constraintsRef}
-          dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          whileTap={{ scale: 0.95 }}
-          onClick={incrementInterest}
-        >
-          <Card className="w-full h-[600px] bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden border-0">
-            {/* Hero Image */}
-            <div className="relative h-64 overflow-hidden group">
-              <img
-                src={currentItem.images[selectedVariant] || currentItem.images[0]}
-                alt={currentItem.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+      {/* Horizontal Card Carousel Container */}
+      <div className="flex items-center justify-center min-h-screen px-4 pt-20 pb-32">
+        <div className="relative w-full max-w-sm mx-auto">
 
-              {/* Trending Badge */}
-              <Badge className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
-                🔥 Trending
-              </Badge>
+          {/* Background Cards Stack (T-Layout) */}
+          {cards.slice(1, 3).map((item, index) => (
+            <motion.div
+              key={`bg-${item.id}-${index}`}
+              className="absolute inset-0 w-full"
+              initial={{ scale: 0.9 - (index * 0.05), y: 8 + (index * 8), opacity: 0.6 - (index * 0.2) }}
+              animate={{ scale: 0.9 - (index * 0.05), y: 8 + (index * 8), opacity: 0.6 - (index * 0.2) }}
+              style={{ zIndex: 10 - index }}
+            >
+              <div className="w-full h-[520px] bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg" />
+            </motion.div>
+          ))}
 
-              {/* Match Score */}
-              <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span className="text-sm font-bold text-green-600">{calculateMatchScore()}% Match</span>
+          {/* Main Interactive Card */}
+          <motion.div
+            ref={constraintsRef}
+            className="relative w-full z-20"
+            drag="x"
+            dragConstraints={{ left: -300, right: 300 }}
+            dragElastic={0.1}
+            onDragEnd={handleDragEnd}
+            animate={controls}
+            style={{ x, y, scale, rotate, opacity }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {/* Neumorphic Card */}
+            <div className="w-full h-[520px] bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-[8px_8px_24px_rgba(0,0,0,0.1),-8px_-8px_24px_rgba(255,255,255,0.9)] border border-white/20 overflow-hidden">
+
+              {/* Hero Image with Overlays */}
+              <div className="relative h-64 overflow-hidden">
+                <motion.img
+                  src={currentItem.images[selectedColorIndex] || currentItem.images[0]}
+                  alt={currentItem.name}
+                  className="w-full h-full object-cover"
+                  style={{
+                    scale: useTransform(x, [-100, 0, 100], [1.1, 1, 1.1])
+                  }}
+                />
+
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+
+                {/* Floating Badges */}
+                <motion.div
+                  className="absolute top-4 left-4"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Premium
+                  </Badge>
+                </motion.div>
+
+                <motion.div
+                  className="absolute top-4 right-4"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg">
+                    <span className="text-sm font-bold text-emerald-600">{calculateMatchScore()}%</span>
+                  </div>
+                </motion.div>
+
+                {/* AR View Button */}
+                <motion.button
+                  className="absolute bottom-4 right-4 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-black/50 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowDetails(!showDetails)}
+                >
+                  <Box className="w-4 h-4" />
+                </motion.button>
               </div>
 
-              {/* Rotation Icon */}
-              <motion.div
-                className="absolute bottom-3 right-3 bg-black/50 text-white p-2 rounded-full cursor-pointer"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <RotateCcw className="w-4 h-4" />
-              </motion.div>
-            </div>
+              {/* Card Content */}
+              <div className="p-6 space-y-4 h-64 flex flex-col">
 
-            {/* Content */}
-            <div className="p-6 space-y-4">
-              {/* Basic Info */}
-              <div className="flex justify-between items-start">
+                {/* Product Info */}
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-gray-900 leading-tight">{currentItem.name}</h2>
-                  <p className="text-orange-600 font-medium">Premium Collection</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {getDimensionsString(currentItem.dimensions)} · {Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-orange-600">${currentItem.price}</div>
-                  <p className="text-xs text-gray-500">CAD</p>
-                </div>
-              </div>
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h2 className="text-xl font-bold text-slate-800 leading-tight">{currentItem.name}</h2>
+                      <p className="text-indigo-600 font-medium text-sm">Premium Collection</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-slate-800">${currentItem.price}</div>
+                      <p className="text-xs text-slate-500">CAD</p>
+                    </div>
+                  </div>
 
-              {/* Color Variants */}
-              {currentItem.colorOptions && currentItem.colorOptions.length > 1 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-700">Available Colors:</p>
-                  <div className="flex gap-2">
-                    {currentItem.colorOptions.map((color, index) => (
-                      <motion.button
-                        key={index}
-                        className={`w-8 h-8 rounded-full border-2 ${selectedVariant === index ? 'border-orange-500' : 'border-gray-300'
-                          }`}
-                        style={{ backgroundColor: getColorValue(color) }}
-                        onClick={() => setSelectedVariant(index)}
-                        whileTap={{ scale: 0.9 }}
-                      />
-                    ))}
+                  {/* Color Selector */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-600">Colors</p>
+                    <div className="flex gap-2">
+                      {getAvailableColors().map((color, index) => (
+                        <motion.button
+                          key={index}
+                          className={`w-8 h-8 rounded-full border-2 shadow-sm ${selectedColorIndex === index
+                            ? 'border-indigo-500 shadow-indigo-200'
+                            : 'border-slate-200'
+                            }`}
+                          style={{ backgroundColor: color.value }}
+                          onClick={() => setSelectedColorIndex(index)}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Style Match Explanation */}
-              <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-3 rounded-lg border border-orange-200">
-                <p className="text-sm text-orange-800">
-                  <span className="font-semibold">Why this matches you:</span> You've been swiping on {currentItem.style.join(', ').toLowerCase()} pieces and warm color palettes — this furniture fits your curated aesthetic perfectly.
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <motion.button
-                  onClick={handleSkip}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-                  whileTap={{ scale: 0.95 }}
+                {/* Match Reason (Expandable) */}
+                <motion.div
+                  className={`bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100 overflow-hidden ${showMatchReason ? 'h-auto' : 'h-12'
+                    }`}
+                  animate={{ height: showMatchReason ? 'auto' : 48 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
-                  <X className="w-5 h-5" />
-                  Pass
-                </motion.button>
-
-                <motion.button
-                  onClick={handleLike}
-                  className="flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Heart className="w-5 h-5" />
-                  Love
-                </motion.button>
-
-                <motion.button
-                  onClick={handleStyleMatch}
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Star className="w-5 h-5" />
-                  Match
-                </motion.button>
+                  <div className="p-3">
+                    <div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => setShowMatchReason(!showMatchReason)}
+                    >
+                      <span className="text-sm font-medium text-indigo-800">Why this matches you</span>
+                      <motion.div
+                        animate={{ rotate: showMatchReason ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Info className="w-4 h-4 text-indigo-600" />
+                      </motion.div>
+                    </div>
+                    {showMatchReason && (
+                      <motion.p
+                        className="text-sm text-indigo-700 mt-2 leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        {getMatchReason()}
+                      </motion.p>
+                    )}
+                  </div>
+                </motion.div>
               </div>
             </div>
-          </Card>
-
-          {/* Swipe Indicators */}
-          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 text-center">
-            <div className="flex flex-col items-center space-y-1">
-              <ChevronUp className="w-6 h-6 text-orange-500" />
-              <span className="text-xs text-gray-600">Style Match</span>
-            </div>
-            <div className="flex flex-col items-center space-y-1">
-              <div className="flex gap-2">
-                <X className="w-6 h-6 text-gray-400" />
-                <Heart className="w-6 h-6 text-pink-500" />
-              </div>
-              <span className="text-xs text-gray-600">Swipe to decide</span>
-            </div>
-            <div className="flex flex-col items-center space-y-1">
-              <ChevronDown className="w-6 h-6 text-blue-500" />
-              <span className="text-xs text-gray-600">More Details</span>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Detail View Modal */}
-      {isDetailView && (
+      {/* Bottom Action Bar (Thumb-Friendly) */}
+      <div className="fixed bottom-0 left-0 right-0 z-30">
+        <div className="bg-white/80 backdrop-blur-xl border-t border-white/20 px-6 py-4 safe-area-pb">
+          <div className="flex gap-4 max-w-sm mx-auto">
+
+            {/* Pass Button */}
+            <motion.button
+              onClick={handlePass}
+              className="flex-1 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <X className="w-5 h-5" />
+              <span className="font-semibold">Pass</span>
+            </motion.button>
+
+            {/* Super Like / AR View */}
+            <motion.button
+              onClick={() => setShowDetails(!showDetails)}
+              className="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl shadow-lg transition-all duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Eye className="w-6 h-6" />
+            </motion.button>
+
+            {/* Like Button */}
+            <motion.button
+              onClick={handleLike}
+              className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-4 px-6 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Heart className="w-5 h-5" />
+              <span className="font-semibold">Love</span>
+            </motion.button>
+          </div>
+
+          {/* Swipe Hint */}
+          <motion.p
+            className="text-center text-xs text-slate-500 mt-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            Swipe horizontally or use buttons • Tap for details
+          </motion.p>
+        </div>
+      </div>
+
+      {/* Detail Expandable Panel */}
+      {showDetails && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end"
-          onClick={() => setIsDetailView(false)}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-end"
+          onClick={() => setShowDetails(false)}
         >
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="w-full bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto"
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="w-full bg-white rounded-t-3xl max-h-[70vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-900">{currentItem.name}</h3>
+
+              {/* Header with drag handle */}
+              <div className="text-center">
+                <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-slate-800">{currentItem.name}</h3>
+                <p className="text-slate-600">Premium Collection</p>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex gap-3">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsDetailView(false)}
-                  className="text-gray-500"
+                  className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                  onClick={() => window.open(currentItem.buyLink, '_blank')}
                 >
-                  <X className="w-5 h-5" />
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  View Store
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    // Add AR functionality here
+                    console.log('AR View activated');
+                  }}
+                >
+                  <Box className="w-4 h-4 mr-2" />
+                  AR View
                 </Button>
               </div>
 
               {/* Image Gallery */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-800">Gallery</h4>
+                <h4 className="font-semibold text-slate-800">Gallery</h4>
                 <div className="grid grid-cols-2 gap-3">
-                  {currentItem.images.map((image, index) => (
-                    <img
+                  {currentItem.images.slice(0, 4).map((image, index) => (
+                    <motion.img
                       key={index}
                       src={image}
                       alt={`${currentItem.name} view ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="w-full h-24 object-cover rounded-xl shadow-sm"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     />
                   ))}
                 </div>
@@ -346,56 +483,25 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
 
               {/* Specifications */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-gray-800">Specifications</h4>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <h4 className="font-semibold text-slate-800">Details</h4>
+                <div className="bg-slate-50 p-4 rounded-2xl space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Dimensions:</span>
-                    <span className="font-medium">{getDimensionsString(currentItem.dimensions)}</span>
+                    <span className="text-slate-600">Materials</span>
+                    <span className="font-medium text-slate-800">
+                      {Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Materials:</span>
-                    <span className="font-medium">{Array.isArray(currentItem.materials) ? currentItem.materials.join(', ') : currentItem.materials}</span>
+                    <span className="text-slate-600">Style</span>
+                    <span className="font-medium text-slate-800">
+                      {Array.isArray(currentItem.style) ? currentItem.style.join(', ') : currentItem.style}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Style:</span>
-                    <span className="font-medium">{Array.isArray(currentItem.style) ? currentItem.style.join(', ') : currentItem.style}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Rating:</span>
-                    <span className="font-medium">⭐ {currentItem.rating}/5</span>
+                    <span className="text-slate-600">Category</span>
+                    <span className="font-medium text-slate-800">{currentItem.category}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Features */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-800">Features</h4>
-                <div className="flex flex-wrap gap-2">
-                  {currentItem.features.map((feature, index) => (
-                    <Badge key={index} variant="secondary" className="bg-orange-100 text-orange-800">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50"
-                  onClick={() => window.open(currentItem.buyLink, '_blank')}
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Store
-                </Button>
-                <Button
-                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white"
-                  onClick={handleLike}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Wishlist
-                </Button>
               </div>
             </div>
           </motion.div>
