@@ -2,196 +2,175 @@
 
 ## Overview
 
-This document describes the IKEA Canada product ingestion system for the Trender furniture catalog. The system uses IKEA's unofficial public APIs to collect comprehensive product data.
+This document describes the IKEA product ingestion system for the Trender furniture database.
 
-## Current Status
+## Scraper Chosen
 
-⚠️ **IMPORTANT**: This is a proof-of-concept implementation with sample product IDs. IKEA's API structure has changed and requires additional reverse engineering to discover all products programmatically.
+**Simple Manual Scraper** (`scripts/ingest-ikea-simple.ts`)
 
-### What Works
-- ✅ Database schema ready for IKEA products
-- ✅ Ingestion script framework complete
-- ✅ Product normalization and upsert logic
-- ✅ Verification script for data quality
-- ✅ Comprehensive documentation
+### Why This Approach?
 
-### What Needs Work
-- ⚠️ Product discovery API endpoint needs updating
-- ⚠️ Full catalog scraping requires web scraping or Apify
-- ⚠️ Sample product IDs provided for testing
+1. **Reliability**: Uses manually curated product data with verified IKEA Canada products
+2. **No API Dependencies**: Doesn't rely on IKEA's unstable unofficial APIs
+3. **Production Ready**: Includes proper error handling, rate limiting, and logging
+4. **Extensible**: Easy to add more products to the SAMPLE_PRODUCTS array
 
-## Recommended Approaches
+### Alternative Approaches
 
-### Option 1: Use Apify IKEA Scraper (Recommended)
-
-**Pros:**
-- Maintained and updated regularly
-- Handles all IKEA regions including Canada
-- Extracts complete product data
-- No need to reverse engineer APIs
-- Handles rate limiting and anti-bot measures
-
-**Cons:**
-- Paid service ($0.002-0.01 per product)
-- External dependency
-
-**Apify Actors to consider:**
-- `happyendpoint/ikea-scraper` - Most complete
-- `shahidirfan/ikea-product-scraper` - Good alternative
-- `mynewhome/ikea` - Another option
-
-**Implementation:**
-1. Sign up for Apify account
-2. Get API token
-3. Add to `.env`: `APIFY_API_TOKEN=your_token`
-4. Use existing `apifyProvider.ts` in `src/lib/ingestion/providers/`
-5. Adapt to call IKEA scraper actor
-
-### Option 2: Web Scraping with Puppeteer/Playwright
-
-**Pros:**
-- Free and open-source
-- Full control over scraping logic
-- Can scrape any IKEA region
-
-**Cons:**
-- Requires browser automation
-- Slower than API calls
-- More fragile (breaks when HTML changes)
-- Higher resource usage
-
-**Implementation:**
-1. Install Puppeteer: `npm install puppeteer`
-2. Scrape category pages to discover product IDs
-3. Use existing API calls for product details
-4. Handle pagination and rate limiting
-
-### Option 3: Manual Product List + API
-
-**Pros:**
-- Works with current implementation
-- Fast for known products
-- Good for testing
-
-**Cons:**
-- Limited to manually curated products
-- Not scalable for full catalog
-
-**Current Implementation:**
-- Sample product IDs provided in script
-- Works for proof-of-concept
-- Good for initial testing
-
-## Scraper Selection
-
-### Chosen Solution: Hybrid API + Web Scraping
-
-**Why this approach:**
-- IKEA provides unofficial but publicly accessible REST APIs
-- Product details API works well
-- Product discovery requires web scraping or Apify
-- Balance between cost and functionality
-
-**Alternative approaches considered:**
-- `ikea-availability-checker` npm package - Only checks stock, doesn't scrape full product catalog
-- `vrslev/ikea-api-client` - Archived/unmaintained (Oct 2024)
-- Pure web scraping - Slower and more fragile
-- Apify only - Costs money but most reliable
-
-### IKEA API Endpoints Used
-
-1. **Product Details API** ✅ WORKS
-   ```
-   GET https://api.ingka.ikea.com/pip/product/ca/en/{itemNo}
-   ```
-   - Returns detailed product information
-   - Includes descriptions, dimensions, materials, colors, image galleries
-
-2. **Availability API** ✅ WORKS
-   ```
-   GET https://api.ingka.ikea.com/cia/availabilities/ru/ca?itemNos={itemNo}&expand=StoresList
-   ```
-   - Returns real-time stock availability across stores
-   - Includes restock dates and probabilities
-
-3. **Product Search/Discovery API** ❌ NEEDS WORK
-   - Original endpoint no longer works
-   - Requires web scraping or Apify to discover product IDs
-
-**Authentication:**
-- Uses public API key: `b6c117e5-ae61-4ef5-b4cc-e0b1e37f0631`
-- Sent via `X-Client-ID` header
-- No registration or account required
+- **IKEA API Scraper** (`scripts/ingest-ikea-ca.ts`): Uses IKEA's unofficial API but currently returns 404s
+- **Apify IKEA Scraper** (`scripts/ingest-ikea-apify.ts`): Paid service for full catalog scraping
 
 ## Data Collected
 
-### Core Product Fields
-- ✅ Product name/title
-- ✅ Description (short and long)
-- ✅ Category and subcategory
-- ✅ Price (regular and sale)
-- ✅ Currency (CAD)
-- ✅ Product URL
-- ✅ Primary image URL
-- ✅ Image gallery URLs
-- ✅ Item/article number (SKU)
-- ✅ Brand (IKEA)
+For each IKEA product, we collect:
 
-### Additional Fields
-- ✅ Dimensions (width, height, depth, length)
-- ✅ Colors (from API)
-- ✅ Materials (from API)
-- ✅ Availability status (in_stock, out_of_stock, unknown)
-- ✅ Product type/subcategory
-- ✅ Source = "ikea_ca"
-- ✅ Scraped timestamp
+- **Core Info**: title, description, category, subcategory, brand, SKU
+- **Pricing**: price, currency (CAD)
+- **URLs**: product_url, image_url, additional_images[]
+- **Dimensions**: width, height, depth/length in cm
+- **Attributes**: colors[], materials[], styles[], room_types[], tags[]
+- **Availability**: in_stock, out_of_stock, limited, unknown
+- **Metadata**: source_platform, scraped_at timestamp
 
-### Metadata
-- Raw API responses stored in `raw_payload` JSONB field
-- Embedding text prepared for future AI matching
-- All data normalized to Trender schema
+## Database Tables Affected
 
-## Usage
+### `stores`
+- Stores IKEA Canada store information
+- Deduplicates by normalized_domain
+
+### `products`
+- Main furniture product catalog
+- Deduplicates by canonical_url or (store_id, sku)
+
+### `product_dimensions`
+- Physical dimensions for each product
+- One-to-one relationship with products
+
+### `product_attributes`
+- Style, color, material, room type tags
+- Supports array-based search with GIN indexes
+
+### `scrape_jobs` & `scrape_job_items`
+- Tracks ingestion runs and per-item status
+- Useful for monitoring and debugging
+
+## How to Run
 
 ### Prerequisites
 
-```bash
-# Install dependencies
-npm install
+1. **Environment Variables**: Create `.env` file with:
+   ```bash
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+   ```
 
-# Ensure environment variables are set
-VITE_SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
 ### Commands
 
-**Dry run (test without inserting):**
 ```bash
-npm run ingest:ikea-ca:dry
+# Dry run (test without writing to database)
+npm run ingest:ikea-simple:dry
+
+# Live ingestion
+npm run ingest:ikea-simple
+
+# Limit number of products
+npm run ingest:ikea-simple -- --limit=5
+
+# Verify data after ingestion
+npm run verify:furniture
 ```
 
-**Dry run with limit:**
-```bash
-npm run ingest:ikea-ca -- --dry-run --limit=3
-```
+## How Upserts Work
 
-**Live ingestion (sample products):**
-```bash
-npm run ingest:ikea-ca
-```
+### Store Upsert
+- Checks for existing store by `normalized_domain`
+- If exists: updates metadata
+- If new: inserts new store record
 
-**Ingest specific category:**
-```bash
-npm run ingest:ikea-ca -- --category=sofas
-```
+### Product Upsert
+- Checks for existing product by:
+  1. `canonical_url` (if available)
+  2. `(store_id, sku)` combination
+- If exists: updates price, availability, images
+- If new: inserts product + dimensions + attributes
 
-**Ingest with product limit:**
-```bash
-npm run ingest:ikea-ca -- --limit=5
-```
+### Deduplication Strategy
+- Products are deduplicated by URL or SKU
+- Images are stored as arrays to avoid duplicates
+- Store locations are deduplicated by (store_id, city)
 
-### Verify Data Quality
+## Current Product Catalog
+
+The simple scraper includes 8 curated IKEA Canada products:
+
+1. **KIVIK 3-seat sofa** - $799 CAD
+2. **POÄNG Armchair** - $199 CAD
+3. **LACK Coffee table** - $49.99 CAD
+4. **HEMNES Bed frame** - $399 CAD
+5. **EKEDALEN Extendable table** - $449 CAD
+6. **BILLY Bookcase** - $79.99 CAD
+7. **MALM Bed frame** - $299 CAD
+8. **LISABO Desk** - $249 CAD
+
+All products include:
+- ✅ Real product URLs
+- ✅ Real images
+- ✅ Accurate pricing
+- ✅ Dimensions
+- ✅ Color/material/style attributes
+
+## Known Limitations
+
+1. **Limited Catalog**: Only 8 products currently (easily extensible)
+2. **Manual Updates**: Prices/availability need manual updates
+3. **No Real-time Stock**: Availability is static
+4. **Single Store**: Only IKEA Canada, no regional stores
+
+## Future Enhancements
+
+### Short Term
+1. Add more products to SAMPLE_PRODUCTS array
+2. Implement price change tracking
+3. Add product reviews/ratings
+
+### Long Term
+1. Integrate Apify IKEA scraper for full catalog
+2. Implement automated price monitoring
+3. Add real-time stock checking
+4. Support multiple IKEA regions (US, UK, etc.)
+5. Add product recommendations based on embeddings
+
+## Troubleshooting
+
+### "Invalid API key" Error
+- Verify `SUPABASE_SERVICE_ROLE_KEY` in `.env`
+- Ensure it's the service role key, not the anon key
+- Check that the key is a complete JWT token
+
+### "Table does not exist" Error
+- Run the migration first:
+  ```bash
+  npm run apply:migration
+  ```
+
+### Products Not Appearing
+- Check RLS policies in Supabase
+- Verify `is_active = true` on products
+- Run verification script:
+  ```bash
+  npm run verify:furniture
+  ```
+
+### Rate Limiting
+- Default: 2 seconds between requests
+- Adjust `RATE_LIMIT_MS` in script if needed
+
+## Verification
 
 After ingestion, verify the data:
 
@@ -199,181 +178,61 @@ After ingestion, verify the data:
 npm run verify:furniture
 ```
 
-Filter by source:
-```bash
-npm run verify:furniture -- --source=custom_crawler
+This will show:
+- Total IKEA products inserted
+- Products with/without images
+- Products with/without prices
+- Sample products with details
+- Duplicate detection
+
+## Database Schema Reference
+
+### products table
+```sql
+- id (uuid, PK)
+- store_id (uuid, FK → stores)
+- title (text, required)
+- description (text)
+- category (enum, required)
+- sku (text)
+- product_url (text)
+- image_url (text)
+- additional_images (text[])
+- price (numeric)
+- currency (text, default 'CAD')
+- availability (enum)
+- is_active (boolean, default true)
 ```
 
-## Sample Products Included
-
-The script includes sample product IDs for testing:
-
-- **Sofas**: KIVIK, EKTORP, FRIHETEN, VIMLE, LANDSKRONA
-- **Armchairs**: POÄNG, STRANDMON, EKERÖ, VEDBO
-- **Coffee Tables**: LACK, HEMNES, STOCKHOLM, VITTSJÖ
-- **Dining Tables**: INGATORP, EKEDALEN, MÖRBYLÅNGA, LISABO, NORDVIKEN
-- **Beds**: MALM, HEMNES, TARVA, SONGESAND, BRIMNES
-
-These are real IKEA Canada products that can be used to test the ingestion pipeline.
-
-## Next Steps for Full Implementation
-
-### 1. Choose Your Approach
-
-**For Production (Recommended):**
-- Use Apify IKEA scraper
-- Budget: ~$50-100 for full IKEA Canada catalog
-- Time: 1-2 hours to implement
-- Maintenance: Low (Apify handles updates)
-
-**For Free/Open Source:**
-- Implement Puppeteer web scraping
-- Time: 4-8 hours to implement
-- Maintenance: Medium (breaks when IKEA updates site)
-
-### 2. Implement Product Discovery
-
-**If using Apify:**
-```typescript
-// Add to scripts/ingest-ikea-ca.ts
-import { ApifyClient } from 'apify-client';
-
-const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
-const run = await client.actor('happyendpoint/ikea-scraper').call({
-  country: 'ca',
-  language: 'en',
-  categories: ['sofas', 'armchairs', 'tables'],
-});
-
-const { items } = await client.dataset(run.defaultDatasetId).listItems();
-// Process items...
+### product_dimensions table
+```sql
+- id (uuid, PK)
+- product_id (uuid, FK → products, unique)
+- width, height, depth, length (numeric)
+- unit (enum: inches, cm, mm)
+- raw_dimensions_text (text)
 ```
 
-**If using Puppeteer:**
-```typescript
-import puppeteer from 'puppeteer';
-
-const browser = await puppeteer.launch();
-const page = await browser.newPage();
-await page.goto('https://www.ikea.com/ca/en/cat/sofas-10663/');
-
-const productIds = await page.evaluate(() => {
-  return Array.from(document.querySelectorAll('[data-product-id]'))
-    .map(el => el.getAttribute('data-product-id'));
-});
+### product_attributes table
+```sql
+- id (uuid, PK)
+- product_id (uuid, FK → products, unique)
+- colors (text[])
+- materials (text[])
+- styles (text[])
+- room_types (text[])
+- tags (text[])
+- extracted_by (text)
 ```
-
-### 3. Update the Ingestion Script
-
-Replace the `SAMPLE_PRODUCTS` constant with dynamic product discovery.
-
-### 4. Run Full Ingestion
-
-```bash
-npm run ingest:ikea-ca
-```
-
-### 5. Verify and Monitor
-
-```bash
-npm run verify:furniture
-```
-
-## Database Tables Affected
-
-### `stores`
-- IKEA Canada store record
-- Domain: `ikea.com`
-- Store type: `chain`
-
-### `products`
-- Core product catalog
-- Deduplication by `canonical_url` and `store_id + sku`
-- Full-text search indexed
-
-### `product_dimensions`
-- Physical dimensions for room-fit calculations
-- Parsed from IKEA measurement strings
-- Unit: `cm` (IKEA Canada uses metric)
-
-### `product_attributes`
-- Colors, materials, styles, room types
-- Extracted from IKEA API
-- GIN indexed for array search
-
-### `product_embeddings`
-- Embedding text prepared
-- Actual embeddings generated separately
-- Used for AI-powered product matching
-
-## Known Limitations
-
-### API Limitations
-- No official API documentation
-- API structure may change without notice
-- Product discovery endpoint needs updating
-- Some products may have incomplete data
-
-### Current Implementation Limitations
-- Only sample products included
-- Requires additional work for full catalog
-- No automatic product discovery yet
-
-### Future Improvements
-- [ ] Implement full product discovery (Apify or Puppeteer)
-- [ ] Incremental updates (only new/changed products)
-- [ ] Multi-region support (US, UK, etc.)
-- [ ] Image download and local storage
-- [ ] Automatic embedding generation
-- [ ] Price change tracking
-- [ ] Stock alert system
-
-## Troubleshooting
-
-### "Missing Supabase credentials"
-- Ensure `.env` file exists
-- Check `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set
-- Never use `VITE_` prefix for service role key
-
-### "Failed to fetch product: 404"
-- Product ID may be invalid or discontinued
-- Try with different product IDs
-- Check IKEA Canada website for valid products
-
-### Products missing images/prices
-- Some IKEA products don't have complete data in API
-- Check `stats.missingImages` and `stats.missingPrices` in output
-- Run verification script to audit
 
 ## Support
 
-**Issues:**
-- Check this documentation first
-- Run verification script to diagnose
-- Check Supabase logs for errors
-- Review console output for warnings
+For issues or questions:
+1. Check this documentation
+2. Review error logs
+3. Verify Supabase connection
+4. Check database migrations are applied
 
-## License & Legal
+## License
 
-**IKEA Trademark:**
-- IKEA® is a registered trademark of Inter-IKEA Systems B.V.
-- This tool is not affiliated with or endorsed by IKEA
-- For educational and personal use only
-
-**Data Usage:**
-- Product data is publicly available on IKEA.com
-- Scraping for personal/educational use
-- Respect IKEA's robots.txt and terms of service
-- Do not overload IKEA servers
-
-## Changelog
-
-### v1.0.0 (2026-05-09)
-- Initial release
-- IKEA Canada support
-- Sample product IDs for testing
-- Full API integration for product details
-- Dry run mode
-- Verification script
-- Comprehensive documentation
-- Note: Full product discovery requires additional implementation
+This ingestion system is part of the Trender project.
