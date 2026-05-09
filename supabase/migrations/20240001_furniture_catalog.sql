@@ -267,10 +267,15 @@ Areeb — 9:58 PM
 sammynuts309@gmail.com
 Haaziq — 10:01 PM
 e
--- Migration notes:
--- This migration creates the furniture catalog database schema
--- Supabase credentials should be stored in environment variables
--- Use .env file for local development (never commit secrets to git)
+You are working on my existing Trender app.
+
+IMPORTANT:
+
+Only construct the Supabase database + ingestion architecture right now.
+
+-- Note: Use environment variables for API keys. Never commit secrets to git.
+-- Set SUPABASE_SERVICE_ROLE_KEY in your .env file for backend operations.
+-- Set VITE_SUPABASE_ANON_KEY in your .env file for frontend operations.
 
 message.txt
 6 KB

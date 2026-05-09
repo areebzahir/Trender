@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { qlooService, QlooRecommendation } from '@/services/qlooApi';
+import { sampleFurniture, FurnitureItem } from '@/data/sampleFurniture';
 
 interface RoomData {
   image: File | null;
@@ -21,7 +21,7 @@ interface EnhancedSwipeInterfaceProps {
 }
 
 export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterfaceProps) => {
-  const [matches, setMatches] = useState<QlooRecommendation[]>([]);
+  const [matches, setMatches] = useState<FurnitureItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -32,20 +32,10 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
     const fetchMatches = async () => {
       try {
         setLoading(true);
-        // Create a basic taste profile for modern/minimalist furniture
-        const basicTasteProfile = {
-          styles: ['modern', 'minimalist', 'contemporary'],
-          colors: ['neutral', 'white', 'gray', 'black'],
-          materials: ['wood', 'metal', 'glass'],
-          brands: [],
-          aesthetics: ['clean', 'simple', 'elegant'],
-          culturalReferences: []
-        };
-        const recommendations = await qlooService.getFurnitureRecommendations(basicTasteProfile);
-        setMatches(recommendations);
+        // Use local product catalogue — no external API needed
+        setMatches(sampleFurniture);
       } catch (error) {
-        console.error('Error fetching recommendations:', error);
-        // Fallback to empty array if API fails
+        console.error('Error loading furniture:', error);
         setMatches([]);
       } finally {
         setLoading(false);

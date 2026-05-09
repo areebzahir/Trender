@@ -14,9 +14,9 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Supabase credentials - load from environment variables
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+// Supabase credentials from environment variables
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'your_supabase_url_here';
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_service_role_key_here';
 
 console.log('🔧 Connecting to Supabase...');
 console.log('   URL:', SUPABASE_URL);

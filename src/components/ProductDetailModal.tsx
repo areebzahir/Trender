@@ -11,24 +11,23 @@ import {
   ShoppingCart,
   Truck,
   Shield,
-  Package,
-  MapPin
+  Package
 } from "lucide-react";
 import { ImageCarousel } from "./ImageCarousel";
 import { ColorPalette } from "./ColorPalette";
-import { QlooRecommendation } from "@/services/qlooApi"; 
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { FurnitureItem } from "@/data/sampleFurniture";
 
 interface ProductDetailModalProps {
-  item: QlooRecommendation;
+  item: FurnitureItem;
   onClose: () => void;
   onLike: () => void;
   onBuy: () => void;
 }
 
 export const ProductDetailModal = ({ item, onClose, onLike, onBuy }: ProductDetailModalProps) => {
-  const { toast } = useToast(); // Initialize toast here
-  const [selectedColor, setSelectedColor] = useState(item.colorOptions && item.colorOptions.length > 0 ? item.colorOptions[0] : undefined);
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(
+    item.colorOptions && item.colorOptions.length > 0 ? item.colorOptions[0].name : undefined
+  );
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleColorSelect = (colorName: string) => {
@@ -107,7 +106,7 @@ export const ProductDetailModal = ({ item, onClose, onLike, onBuy }: ProductDeta
                   )}
                 </div>
 
-                {item.reasoning && <p className="text-muted-foreground">{item.reasoning}</p>}
+                {item.whyMatch && <p className="text-muted-foreground">{item.whyMatch}</p>}
               </div>
 
               {/* Color Options */}
@@ -190,22 +189,6 @@ export const ProductDetailModal = ({ item, onClose, onLike, onBuy }: ProductDeta
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View at Store
-                    </Button>
-                  )}
-                  {item.storeLocations && item.storeLocations.length > 0 && (
-                    <Button 
-                      variant="outline" 
-                      className="flex-1"
-                      onClick={() => {
-                        toast({
-                          title: "Store Locations",
-                          description: `Finding stores near you for ${item.name}`,
-                        });
-                        console.log("Store Locations:", item.storeLocations);
-                      }}
-                    >
-                      <MapPin className="w-4 h-4 mr-2" />
-                      Find in Stores
                     </Button>
                   )}
                 </div>

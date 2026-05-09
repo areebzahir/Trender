@@ -12,10 +12,18 @@ import {
   Layers,
   Zap
 } from "lucide-react";
-import { QlooTasteProfile } from "@/services/qlooApi";
+
+interface StyleProfile {
+  styles: string[];
+  colors: string[];
+  materials: string[];
+  brands: string[];
+  aesthetics: string[];
+  culturalReferences: string[];
+}
 
 interface TasteProfileDashboardProps {
-  tasteProfile: QlooTasteProfile;
+  tasteProfile: StyleProfile;
   swipeCount: number;
   matchCount: number;
   onExploreAlternate?: () => void;
@@ -51,8 +59,8 @@ export const TasteProfileDashboard = ({
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-foreground">Your Taste Profile</h2>
-            <p className="text-sm text-muted-foreground">Powered by Qloo Cultural Intelligence</p>
+            <h2 className="text-xl font-bold text-foreground">Your Style Profile</h2>
+            <p className="text-sm text-muted-foreground">Powered by AI Design Intelligence</p>
           </div>
         </div>
         <Badge variant="secondary" className={`${confidence.color} text-white`}>
@@ -60,10 +68,10 @@ export const TasteProfileDashboard = ({
         </Badge>
       </div>
 
-      {/* Taste Evolution Bar */}
+      {/* Style Evolution Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-foreground">Taste Evolution</span>
+          <span className="text-sm font-medium text-foreground">Style Evolution</span>
           <span className="text-sm text-muted-foreground">{swipeCount}/20 swipes</span>
         </div>
         <Progress value={evolutionProgress} className="h-2" />
@@ -136,7 +144,7 @@ export const TasteProfileDashboard = ({
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-4 h-4 text-accent" />
-            <h3 className="font-semibold text-foreground">Cultural Influences</h3>
+            <h3 className="font-semibold text-foreground">Design Influences</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {tasteProfile.culturalReferences.map((ref, index) => (

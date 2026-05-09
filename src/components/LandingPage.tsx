@@ -23,7 +23,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
     {
       icon: Sparkles,
       title: "AI Style Analysis", 
-      description: "Advanced algorithms analyze your taste using Qloo's cultural intelligence",
+      description: "Advanced vision AI analyzes your room and understands your design goals",
       color: "text-accent"
     },
     {

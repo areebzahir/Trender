@@ -2,12 +2,23 @@ import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
 import { ChoicePage } from "@/components/ChoicePage";
 import { RoomUpload } from "@/components/RoomUpload";
+import { RoomUploadPage } from "@/components/RoomUploadPage";
+import { AIResultsPage } from "@/components/AIResultsPage";
 import TrenderSwipeScreen from "@/components/TrenderSwipeScreen";
 import { StyleQuiz } from "@/components/StyleQuiz";
 import { StyleResults } from "@/components/StyleResults";
 import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
+import type { AIAnalysisResult } from "@/types/api";
 
-type AppState = 'landing' | 'choice' | 'upload' | 'quiz' | 'results' | 'swipe' | 'enhanced-swipe';
+type AppState =
+  | 'landing'
+  | 'choice'
+  | 'upload'
+  | 'quiz'
+  | 'results'
+  | 'swipe'
+  | 'enhanced-swipe'
+  | 'ai-results'; // NEW — AI personalization results page
 
 interface RoomData {
   image: File | null;
@@ -19,6 +30,10 @@ interface RoomData {
 const Index = () => {
   const [currentState, setCurrentState] = useState<AppState>('landing');
   const [roomData, setRoomData] = useState<RoomData | null>(null);
+  // NEW — holds the full AI analysis result for the ai-results page
+  const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
+
+  // ── Existing handlers (unchanged) ─────────────────────────────────────────
 
   const handleGetStarted = () => {
     setCurrentState('choice');
@@ -32,7 +47,9 @@ const Index = () => {
   const handleQuizComplete = (results: Record<string, string>) => {
     console.log('Quiz completed with results:', results);
     setRoomData(prev => {
-      const newData = prev ? { ...prev, quizResults: results } : { image: null, preferences: '', quizResults: results };
+      const newData = prev
+        ? { ...prev, quizResults: results }
+        : { image: null, preferences: '', quizResults: results };
       console.log('Setting roomData:', newData);
       return newData;
     });
@@ -65,7 +82,6 @@ const Index = () => {
   };
 
   const handleStyleQuiz = () => {
-    // Initialize roomData with empty quiz results for direct quiz access
     setRoomData({
       image: null,
       preferences: '',
@@ -86,6 +102,28 @@ const Index = () => {
     setCurrentState('swipe');
   };
 
+  // ── NEW handlers for AI personalization flow ───────────────────────────────
+
+  /** Called by RoomUploadPage when the full AI pipeline completes. */
+  const handleAIAnalysisComplete = (result: AIAnalysisResult) => {
+    setAiResult(result);
+    setCurrentState('ai-results');
+  };
+
+  /** "Back" from AI results → return to upload page. */
+  const handleBackFromAIResults = () => {
+    setCurrentState('upload');
+  };
+
+  /** "Start Over" from AI results → clear state and return to landing. */
+  const handleStartOver = () => {
+    setAiResult(null);
+    setRoomData(null);
+    setCurrentState('landing');
+  };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
   if (currentState === 'landing') {
     return <LandingPage onGetStarted={handleGetStarted} />;
   }
@@ -101,10 +139,21 @@ const Index = () => {
   }
 
   if (currentState === 'upload') {
+    // Use the new AI-powered RoomUploadPage
     return (
-      <RoomUpload
-        onContinue={handleRoomUpload}
+      <RoomUploadPage
+        onAnalysisComplete={handleAIAnalysisComplete}
         onBack={handleBackToChoice}
+      />
+    );
+  }
+
+  if (currentState === 'ai-results' && aiResult) {
+    return (
+      <AIResultsPage
+        result={aiResult}
+        onBack={handleBackFromAIResults}
+        onStartOver={handleStartOver}
       />
     );
   }
