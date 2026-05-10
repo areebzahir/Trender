@@ -219,9 +219,8 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
     (async () => {
       // Validate images — only filter out obviously broken ones (no URL, placeholder)
       const validated = await Promise.all(
-        candidates.slice(0, 15).map(async c => ({
+        candidates.slice(0, 50).map(async c => ({
           candidate: c,
-          // Only reject if there's literally no image URL or it's the placeholder
           valid: !!(c.imageUrl && c.imageUrl !== '/placeholder.svg' && c.imageUrl.startsWith('http')),
         }))
       );
@@ -230,8 +229,7 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
 
       const validCandidates = validated
         .filter(v => v.valid)
-        .map(v => v.candidate)
-        .slice(0, 8);
+        .map(v => v.candidate);
 
       if (validCandidates.length === 0) {
         setAllDone(true);

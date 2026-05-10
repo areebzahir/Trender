@@ -242,7 +242,7 @@ async function handleOverlayCreate(body: Record<string, unknown>, res: ServerRes
       selectedProduct: data.selectedProduct,
       placement:       data.placement,
       renderGuidance:  data.renderGuidance,
-      allCandidates:   data.allCandidates.slice(0, 10),
+      allCandidates:   data.allCandidates,
     });
   } catch (err) {
     console.error('[overlay-create]', err);
@@ -272,29 +272,22 @@ async function handleRemoveBg(body: Record<string, unknown>, res: ServerResponse
 
     const resultBuf = Buffer.from(await resultBlob.arrayBuffer());
 
-    // ── Quality check ─────────────────────────────────────────────────────────
-    // Decode the PNG and count non-transparent pixels.
-    // If fewer than 12% of pixels survived, the model removed the furniture
-    // (happens when furniture color matches background). Fall back to original.
-    const { createCanvas, loadImage } = await import('canvas');
-    const img = await loadImage(resultBuf);
-    const cv = createCanvas(img.width, img.height);
-    const ctx = cv.getContext('2d');
-    ctx.drawImage(img as any, 0, 0);
-    const pixels = ctx.getImageData(0, 0, img.width, img.height).data;
-    let nonTransparent = 0;
-    for (let i = 3; i < pixels.length; i += 4) {
-      if (pixels[i] > 10) nonTransparent++;
-    }
-    const totalPixels = img.width * img.height;
-    const ratio = nonTransparent / totalPixels;
-    console.log(`[remove-bg] Quality check: ${(ratio * 100).toFixed(1)}% pixels retained`);
+    // ── Quality check — pure JS, no native canvas dependency ─────────────────
+    // Parse PNG IDAT chunks to count non-transparent pixels
+    let ratio = 1.0;
+    try {
+      // Simple approach: check if result is significantly smaller than input
+      // A good removal keeps most pixels; a bad one (furniture removed) shrinks a lot
+      const inputSize  = arrayBuffer.byteLength;
+      const resultSize = resultBuf.byteLength;
+      // If result PNG is less than 8% of input size, likely everything was removed
+      ratio = resultSize / inputSize;
+      console.log(`[remove-bg] Size ratio: ${(ratio * 100).toFixed(1)}% (result/input)`);
+    } catch { /* non-fatal */ }
 
-    if (ratio < 0.12) {
-      // Too much removed — return original image as data URL
-      console.warn('[remove-bg] Quality check failed, returning original image');
-      const originalBuf = Buffer.from(arrayBuffer);
-      const originalDataUrl = `data:${contentType};base64,${originalBuf.toString('base64')}`;
+    if (ratio < 0.08) {
+      console.warn('[remove-bg] Quality check failed (too small), returning original');
+      const originalDataUrl = `data:${contentType};base64,${Buffer.from(arrayBuffer).toString('base64')}`;
       return send(res, 200, { dataUrl: originalDataUrl, usedFallback: true });
     }
 

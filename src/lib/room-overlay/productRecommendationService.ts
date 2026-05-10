@@ -5,7 +5,7 @@
 
 import type { ProductCandidate, RoomAnalysis, UserRoomPromptInput } from './types';
 
-const TOP_N_FOR_GEMINI = 15;
+const TOP_N_FOR_GEMINI = 30;
 
 function normalize(s: string): string {
   return s.toLowerCase().trim();

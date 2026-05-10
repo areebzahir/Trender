@@ -33,7 +33,7 @@ export function getGeminiClient(): GoogleGenAI {
  */
 export async function callGemini(
   parts: Parameters<GoogleGenAI['models']['generateContent']>[0]['contents'],
-  opts?: { forceModel?: string; forceJson?: boolean }
+  opts?: { forceModel?: string; forceJson?: boolean; isRetry?: boolean }
 ): Promise<string> {
   const config = getGeminiConfig();
   const client = getGeminiClient();
@@ -47,7 +47,6 @@ export async function callGemini(
       config: {
         temperature:     config.temperature,
         maxOutputTokens: config.maxOutputTokens,
-        // Force JSON output so Gemini never returns prose
         ...(forceJson ? { responseMimeType: 'application/json' } : {}),
       },
     });
@@ -57,10 +56,18 @@ export async function callGemini(
     return text;
 
   } catch (err) {
-    if (
-      config.enableProFallback &&
-      model !== config.fallbackModel
-    ) {
+    const msg = (err as Error).message ?? '';
+
+    // Retry once on 503 (temporary high demand) after a short wait
+    if (msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')) {
+      if (!opts?.isRetry) {
+        console.warn('[geminiClient] 503 received, retrying in 3s...');
+        await new Promise(r => setTimeout(r, 3000));
+        return callGemini(parts, { ...opts, isRetry: true });
+      }
+    }
+
+    if (config.enableProFallback && model !== config.fallbackModel) {
       console.warn(`[geminiClient] Flash failed, falling back to ${config.fallbackModel}:`, err);
       return callGemini(parts, { forceModel: config.fallbackModel, forceJson });
     }

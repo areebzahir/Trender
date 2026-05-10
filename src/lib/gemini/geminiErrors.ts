@@ -46,11 +46,12 @@ export class GeminiRankingError extends Error {
 /** Maps internal errors to safe user-facing messages. */
 export function toUserMessage(err: unknown): string {
   if (err instanceof Error) {
-    // Rate limit / quota exceeded
     if (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota')) {
-      return 'Gemini API quota exceeded. Please wait a few minutes and try again, or enable billing at aistudio.google.com.';
+      return 'Gemini API quota exceeded. Please wait a few minutes and try again.';
     }
-    // API key issues
+    if (err.message.includes('503') || err.message.includes('UNAVAILABLE') || err.message.includes('high demand')) {
+      return 'Gemini is temporarily busy. Please try again in a moment.';
+    }
     if (err.message.includes('403') || err.message.includes('API_KEY') || err.message.includes('PERMISSION_DENIED')) {
       return 'Gemini API key error. Please check your GEMINI_API_KEY in .env.';
     }

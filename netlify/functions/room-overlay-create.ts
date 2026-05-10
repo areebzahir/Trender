@@ -58,7 +58,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
         renderGuidance:  data.renderGuidance,
 
         // All ranked candidates (for UI to show alternatives)
-        allCandidates: data.allCandidates.slice(0, 10),
+        allCandidates: data.allCandidates,
       }),
     };
   } catch (err) {

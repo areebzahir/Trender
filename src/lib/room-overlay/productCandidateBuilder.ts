@@ -7,7 +7,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { RoomAnalysis, ProductCandidate } from './types';
 
-const MAX_CANDIDATES = 50;
+const MAX_CANDIDATES = 100;
 
 function getSupabaseAdmin() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? '';
