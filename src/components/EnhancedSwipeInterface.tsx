@@ -46,8 +46,12 @@ export const EnhancedSwipeInterface = ({ onBack, roomData }: EnhancedSwipeInterf
   }, []);
 
   const filteredMatches = matches.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.brand.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase();
+    const matchesSearch = !term || 
+                         item.name.toLowerCase().includes(term) ||
+                         item.brand.toLowerCase().includes(term) ||
+                         item.category?.toLowerCase().includes(term) ||
+                         item.style?.some(s => s.toLowerCase().includes(term));
     const matchesCategory = selectedCategory === 'all' || 
                            item.category?.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;

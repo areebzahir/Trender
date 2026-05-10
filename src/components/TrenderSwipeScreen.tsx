@@ -5,7 +5,10 @@ import { ThemedFluidBlob } from './ThemedFluidBlob';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useWishlistStore, WishlistItem } from './WishlistStore';
-import { sampleFurniture } from '@/data/sampleFurniture';
+import { sampleFurniture, pinnedFirstCard } from '@/data/sampleFurniture';
+
+// Full deck: pinned card first, then the rest
+const fullDeck = [pinnedFirstCard, ...sampleFurniture];
 
 interface RoomData {
   image: File | null;
@@ -26,7 +29,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [showMatchReason, setShowMatchReason] = useState(false);
   const [showExpandedImage, setShowExpandedImage] = useState(false);
-  const [cards, setCards] = useState(sampleFurniture.slice(0, 3));
+  const [cards, setCards] = useState(fullDeck.slice(0, 3));
   const { add: addToWishlist } = useWishlistStore();
 
   const x = useMotionValue(0);
@@ -38,7 +41,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   const controls = useAnimation();
   const constraintsRef = useRef(null);
 
-  const currentItem = cards[0] || sampleFurniture[currentIndex];
+  const currentItem = cards[0] || fullDeck[currentIndex];
 
   // Auto-show match reason after 2 seconds of viewing
   useEffect(() => {
@@ -52,8 +55,8 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
   useEffect(() => {
     const nextCards = [];
     for (let i = 0; i < 3; i++) {
-      const index = (currentIndex + i) % sampleFurniture.length;
-      nextCards.push(sampleFurniture[index]);
+      const index = (currentIndex + i) % fullDeck.length;
+      nextCards.push(fullDeck[index]);
     }
     setCards(nextCards);
   }, [currentIndex]);
@@ -205,7 +208,7 @@ const TrenderSwipeScreen: React.FC<TrenderSwipeScreenProps> = ({ onBack, onGoToE
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-xl font-bold text-orange-900">Trender</h1>
-          <p className="text-xs text-orange-600 mt-1">{currentIndex + 1} of {sampleFurniture.length}</p>
+          <p className="text-xs text-orange-600 mt-1">{currentIndex + 1} of {fullDeck.length}</p>
         </motion.div>
 
         <motion.button

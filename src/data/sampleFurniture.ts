@@ -29,6 +29,36 @@ export interface FurnitureItem {
   whyMatch?: string;
 }
 
+// Pinned first card — shown only on the first swipe in TrenderSwipeScreen
+export const pinnedFirstCard: FurnitureItem = {
+  id: "pinned-spadina",
+  name: "Spadina Sofa – Auckland Willow",
+  category: "Seating",
+  brand: "Blueprint Home",
+  price: 2199,
+  images: [
+    "https://cdn.shopify.com/s/files/1/0073/0166/0725/files/SpadinaSofa-AucklandWillow-L01.jpg?v=1775588655"
+  ],
+  description: "The Spadina Sofa combines clean lines with plush comfort. Upholstered in Auckland Willow fabric, its timeless silhouette fits seamlessly into modern and transitional interiors.",
+  dimensions: {
+    width: "90\"",
+    height: "33\"",
+    depth: "38\""
+  },
+  colorOptions: [
+    { name: "Auckland Willow", hex: "#C8BFA8", image: "https://cdn.shopify.com/s/files/1/0073/0166/0725/files/SpadinaSofa-AucklandWillow-L01.jpg?v=1775588655" }
+  ],
+  style: ["Modern", "Contemporary", "Minimalist"],
+  materials: ["Performance Fabric", "Solid Wood Frame", "High-Density Foam"],
+  careInstructions: ["Spot clean with mild detergent", "Vacuum regularly", "Avoid direct sunlight"],
+  features: ["Clean-line silhouette", "High-density foam cushions", "Solid wood frame", "Performance fabric"],
+  rating: 4.8,
+  reviewCount: 47,
+  inStock: true,
+  buyLink: "https://blueprinthome.com/products/spadina-sofa?variant=48080284680414",
+  whyMatch: "The Spadina's clean minimalist silhouette and neutral Auckland Willow fabric make it a perfect match for your modern living space."
+};
+
 export const sampleFurniture: FurnitureItem[] = [
   {
     id: "1",

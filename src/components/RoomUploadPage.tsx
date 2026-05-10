@@ -221,7 +221,7 @@ export const RoomUploadPage = ({ onAnalysisComplete, onBack }: RoomUploadPagePro
       };
 
       // 4. Map ProductCandidates → Product shape for ProductCard
-      const products = (allCandidates ?? []).slice(0, 12).map((c: any) => ({
+      const pipelineProducts = (allCandidates ?? []).slice(0, 12).map((c: any) => ({
         id:            c.id,
         name:          c.title,
         storeName:     c.storeName ?? 'Store',
@@ -238,6 +238,27 @@ export const RoomUploadPage = ({ onAnalysisComplete, onBack }: RoomUploadPagePro
         roomTags:      c.roomType ? [c.roomType] : [],
         inStock:       true,
       }));
+
+      // Hardcoded first product — always shown as the first result
+      const pinnedProduct = {
+        id:            'pinned-spadina-sofa',
+        name:          'Spadina Sofa – Auckland Willow',
+        storeName:     'Blueprint Home',
+        category:      'sofa',
+        price:         2199,
+        currency:      'CAD',
+        productUrl:    'https://blueprinthome.com/products/spadina-sofa?variant=48080284680414',
+        affiliateUrl:  'https://blueprinthome.com/products/spadina-sofa?variant=48080284680414',
+        imageUrl:      'https://cdn.shopify.com/s/files/1/0073/0166/0725/files/SpadinaSofa-AucklandWillow-L01.jpg?v=1775588655',
+        cleanImageUrl: 'https://cdn.shopify.com/s/files/1/0073/0166/0725/files/SpadinaSofa-AucklandWillow-L01.jpg?v=1775588655',
+        colorTags:     ['beige', 'cream', 'willow'],
+        styleTags:     ['modern', 'minimalist', 'contemporary'],
+        materialTags:  ['performance fabric', 'solid wood'],
+        roomTags:      ['living room'],
+        inStock:       true,
+      };
+
+      const products = [pinnedProduct, ...pipelineProducts];
 
       // 5. Generate room preview (non-blocking)
       let previewUrl: string | null = null;

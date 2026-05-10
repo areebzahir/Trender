@@ -192,6 +192,111 @@ const SwipeCard: React.FC<CardProps> = ({ card, isTop, stackIndex, onSwipe }) =>
   );
 };
 
+// ─── Hardcoded first 5 showcase products ──────────────────────────────────────
+
+const PINNED_SHOWCASE_CARDS: SwipeResultCard[] = [
+  {
+    id: 'pinned-1-spadina',
+    productId: 'pinned-1-spadina',
+    stitchedImageUrl: '/showcase/spadina.png',
+    stitchLoading: false,
+    stitchError: false,
+    roomImageUrl: '',
+    productImageUrl: '/showcase/spadina.png',
+    productName: 'Spadina Sofa – Auckland Willow',
+    storeName: 'Blueprint Home',
+    price: 2199,
+    currency: 'CAD',
+    productUrl: 'https://blueprinthome.com/products/spadina-sofa?variant=48080284680414',
+    category: 'sofa',
+    styleTags: ['Modern', 'Minimalist', 'Contemporary'],
+    colorTags: ['beige', 'cream'],
+    whySelected: 'Clean minimalist silhouette with neutral Auckland Willow fabric — perfect for modern living spaces.',
+    renderWarnings: [],
+    swipeStatus: 'pending',
+  },
+  {
+    id: 'pinned-2-augusta',
+    productId: 'pinned-2-augusta',
+    stitchedImageUrl: '/showcase/augusta.png',
+    stitchLoading: false,
+    stitchError: false,
+    roomImageUrl: '',
+    productImageUrl: '/showcase/augusta.png',
+    productName: 'Augusta Sofa – Caledon Cinder',
+    storeName: 'Blueprint Home',
+    price: 1899,
+    currency: 'CAD',
+    productUrl: 'https://blueprinthome.com/products/augusta-sofa?variant=45040935207134',
+    category: 'sofa',
+    styleTags: ['Modern', 'Scandinavian', 'Contemporary'],
+    colorTags: ['grey', 'charcoal'],
+    whySelected: 'Structured silhouette with walnut pewter legs — fits modern and Scandinavian interiors.',
+    renderWarnings: [],
+    swipeStatus: 'pending',
+  },
+  {
+    id: 'pinned-3-flipside',
+    productId: 'pinned-3-flipside',
+    stitchedImageUrl: '/showcase/flipside.png',
+    stitchLoading: false,
+    stitchError: false,
+    roomImageUrl: '',
+    productImageUrl: '/showcase/flipside.png',
+    productName: 'Flipside Sofa – Velvet Mercury',
+    storeName: 'Blueprint Home',
+    price: 1499,
+    currency: 'CAD',
+    productUrl: 'https://blueprinthome.com/products/flipside-sofa?variant=32686368161880',
+    category: 'sofa',
+    styleTags: ['Modern', 'Versatile', 'Compact'],
+    colorTags: ['grey', 'silver'],
+    whySelected: 'Versatile sofa-bed in velvet mercury — great for smaller spaces without sacrificing style.',
+    renderWarnings: [],
+    swipeStatus: 'pending',
+  },
+  {
+    id: 'pinned-4-alton',
+    productId: 'pinned-4-alton',
+    stitchedImageUrl: '/showcase/alton.png',
+    stitchLoading: false,
+    stitchError: false,
+    roomImageUrl: '',
+    productImageUrl: '/showcase/alton.png',
+    productName: 'Alton Sofa',
+    storeName: 'Elte',
+    price: 3499,
+    currency: 'CAD',
+    productUrl: 'https://www.elte.com/products/alton-sofa-118741230000',
+    category: 'sofa',
+    styleTags: ['Modern', 'Luxury', 'Minimalist'],
+    colorTags: ['beige', 'taupe'],
+    whySelected: 'Luxurious deep-seat sofa with clean lines — a statement piece for refined living rooms.',
+    renderWarnings: [],
+    swipeStatus: 'pending',
+  },
+  {
+    id: 'pinned-5-rhine',
+    productId: 'pinned-5-rhine',
+    stitchedImageUrl: '/showcase/rhina.png',
+    stitchLoading: false,
+    stitchError: false,
+    roomImageUrl: '',
+    productImageUrl: '/showcase/rhina.png',
+    productName: 'Rhine Sofa – Haven',
+    storeName: 'Elte',
+    price: 4299,
+    currency: 'CAD',
+    productUrl: 'https://www.elte.com/products/rhine-sofa-haven',
+    category: 'sofa',
+    styleTags: ['Modern', 'Luxury', 'Contemporary'],
+    colorTags: ['charcoal', 'dark grey'],
+    whySelected: 'Deep, plush seating with bold proportions — a luxurious anchor for any living space.',
+    renderWarnings: [],
+    swipeStatus: 'pending',
+  },
+];
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
@@ -212,8 +317,6 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
 
   // Build initial cards from candidates — filter out those with invalid images
   useEffect(() => {
-    if (!candidates.length) return;
-
     let cancelled = false;
 
     (async () => {
@@ -231,12 +334,12 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
         .filter(v => v.valid)
         .map(v => v.candidate);
 
-      if (validCandidates.length === 0) {
+      if (validCandidates.length === 0 && PINNED_SHOWCASE_CARDS.length === 0) {
         setAllDone(true);
         return;
       }
 
-      const initial: SwipeResultCard[] = validCandidates.map(c => ({
+      const dbCards: SwipeResultCard[] = validCandidates.map(c => ({
         id: c.id,
         productId: c.id,
         stitchedImageUrl: null,
@@ -257,11 +360,12 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
         swipeStatus: 'pending',
       }));
 
+      // Pinned showcase cards first, then DB results
+      const initial = [...PINNED_SHOWCASE_CARDS, ...dbCards];
       setCards(initial);
 
-      // Stitch images progressively — top card first, then rest
-      // Background removal takes ~3-5s per image so we stagger generously
-      initial.forEach((card, i) => {
+      // Stitch images progressively — only for DB cards (pinned ones are pre-composited)
+      dbCards.forEach((card, i) => {
         const delay = i * 1500;
         setTimeout(async () => {
           if (cancelled) return;
@@ -269,7 +373,7 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
             const result = await stitchProductIntoRoom({
               roomImageSrc,
               productImageSrc: card.productImageUrl,
-              placement: i === 0 ? placement : null, // only top card uses Gemini placement
+              placement: i === 0 ? placement : null,
               productCategory: card.category,
             });
             if (cancelled) return;
@@ -280,7 +384,6 @@ const SwipeResultsPage: React.FC<SwipeResultsPageProps> = ({
             ));
           } catch {
             if (cancelled) return;
-            // Stitching failed — show product image directly instead of removing card
             setCards(prev => prev.map(c =>
               c.id === card.id
                 ? { ...c, stitchLoading: false, stitchError: true, stitchedImageUrl: card.productImageUrl }

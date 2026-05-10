@@ -18,9 +18,24 @@ const BLOCKED_PRODUCT_TITLES: string[] = [
   'chalet studio sofa',
   'no7 modular xl sectional',
   'n701 modular',
+  'n701',
   'renfrew sectional',
   'renfrew xl sofa',
   'renfrew sofa',
+  'ashdale sectional',
+  'transit end table',
+  'chalet studio sectional',
+  'n701 xl modular sectional',
+];
+
+/**
+ * Categories to always exclude from results (regardless of query).
+ */
+const BLOCKED_CATEGORIES: string[] = [
+  'lighting',
+  'lamp',
+  'floor_lamp',
+  'table_lamp',
 ];
 
 /**
@@ -118,6 +133,12 @@ export async function buildProductCandidates(
     query = query.in('category', categories);
   }
 
+  // Explicitly exclude lighting/lamps when searching for seating
+  const seatingCategories = ['sofa', 'sectional', 'loveseat', 'armchair', 'accent_chair'];
+  if (categories.some(c => seatingCategories.includes(c))) {
+    query = query.not('category', 'eq', 'lighting');
+  }
+
   // Budget filter
   if (budget && budget > 0) {
     query = query.lte('price', budget);
@@ -177,6 +198,11 @@ export async function buildProductCandidates(
     if (maxWidthCm && c.widthCm && c.widthCm > maxWidthCm) return false;
     // Reject products with no image
     if (!c.imageUrl) return false;
+    // Reject products in blocked categories (e.g. lamps)
+    if (c.category && BLOCKED_CATEGORIES.includes(c.category.toLowerCase())) {
+      console.log(`[productCandidateBuilder] Blocked product (category): ${c.title} [${c.category}]`);
+      return false;
+    }
     // Reject products with blocked titles (bad images)
     const titleLower = c.title.toLowerCase();
     if (BLOCKED_PRODUCT_TITLES.some(blocked => titleLower.includes(blocked))) {
