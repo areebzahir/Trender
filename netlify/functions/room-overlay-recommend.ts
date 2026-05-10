@@ -7,6 +7,7 @@ import type { Handler, HandlerEvent } from '@netlify/functions';
 import { buildProductCandidates } from '../../src/lib/room-overlay/productCandidateBuilder';
 import { scoreAndRankCandidates } from '../../src/lib/room-overlay/productRecommendationService';
 import { rankProductsWithGemini } from '../../src/lib/gemini/rankProductsWithGemini';
+import { extractIntent } from '../../src/lib/gemini/extractIntent';
 import { toUserMessage } from '../../src/lib/gemini/geminiErrors';
 import type { UserRoomPromptInput, RoomAnalysis } from '../../src/lib/room-overlay/types';
 
@@ -18,27 +19,43 @@ export const handler: Handler = async (event: HandlerEvent) => {
   try { body = JSON.parse(event.body ?? '{}'); }
   catch { return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON.' }) }; }
 
-  const { userPrompt, roomAnalysis, budget } = body;
+  const { userPrompt, roomAnalysis, budget, forcedCategories } = body;
 
   if (!userPrompt || !roomAnalysis)
     return { statusCode: 400, body: JSON.stringify({ error: 'userPrompt and roomAnalysis are required.' }) };
 
   try {
     const budgetNum = typeof budget === 'number' ? budget : undefined;
+    const analysis = roomAnalysis as RoomAnalysis;
+    const prompt = userPrompt as UserRoomPromptInput;
 
-    const rawCandidates = await buildProductCandidates(roomAnalysis as RoomAnalysis, budgetNum);
+    // Extract categories from the user's original prompt to enforce strict filtering
+    let dbCategories: string[] = [];
+    if (Array.isArray(forcedCategories) && forcedCategories.length > 0) {
+      dbCategories = forcedCategories as string[];
+    } else if (prompt.originalPrompt) {
+      const intent = await extractIntent(prompt.originalPrompt);
+      dbCategories = intent.dbCategories;
+      console.log('[room-overlay-recommend] Extracted categories:', dbCategories);
+    }
+
+    const rawCandidates = await buildProductCandidates(
+      analysis,
+      budgetNum,
+      dbCategories.length > 0 ? dbCategories : undefined
+    );
     const scored = scoreAndRankCandidates(
       rawCandidates,
-      roomAnalysis as RoomAnalysis,
-      userPrompt as UserRoomPromptInput,
+      analysis,
+      prompt,
       budgetNum
     );
 
     let finalCandidates = scored;
     try {
       const ranking = await rankProductsWithGemini(
-        userPrompt as UserRoomPromptInput,
-        roomAnalysis as RoomAnalysis,
+        prompt,
+        analysis,
         scored
       );
       const scoreMap = new Map(ranking.rankedProducts.map(r => [r.productId, r]));

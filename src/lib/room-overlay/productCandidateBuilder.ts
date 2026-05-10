@@ -9,6 +9,31 @@ import type { RoomAnalysis, ProductCandidate } from './types';
 
 const MAX_CANDIDATES = 100;
 
+/**
+ * Products with known bad/unusable images that fail background removal
+ * or have poor quality renders. These are excluded from results.
+ * Add product titles (case-insensitive partial match) to block them.
+ */
+const BLOCKED_PRODUCT_TITLES: string[] = [
+  'chalet studio sofa',
+  'no7 modular xl sectional',
+  'n701 modular',
+  'renfrew sectional',
+  'renfrew xl sofa',
+  'renfrew sofa',
+];
+
+/**
+ * Image URL patterns that indicate poor quality or unusable images.
+ * Products with these patterns in their image_url are excluded.
+ */
+const BLOCKED_IMAGE_PATTERNS: RegExp[] = [
+  /placeholder/i,
+  /no-image/i,
+  /coming-soon/i,
+  /default\.(jpg|png|webp)/i,
+];
+
 function getSupabaseAdmin() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? '';
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
@@ -152,6 +177,17 @@ export async function buildProductCandidates(
     if (maxWidthCm && c.widthCm && c.widthCm > maxWidthCm) return false;
     // Reject products with no image
     if (!c.imageUrl) return false;
+    // Reject products with blocked titles (bad images)
+    const titleLower = c.title.toLowerCase();
+    if (BLOCKED_PRODUCT_TITLES.some(blocked => titleLower.includes(blocked))) {
+      console.log(`[productCandidateBuilder] Blocked product (bad image): ${c.title}`);
+      return false;
+    }
+    // Reject products with blocked image URL patterns
+    if (BLOCKED_IMAGE_PATTERNS.some(pattern => pattern.test(c.imageUrl))) {
+      console.log(`[productCandidateBuilder] Blocked product (bad image URL): ${c.title}`);
+      return false;
+    }
     return true;
   });
 }
