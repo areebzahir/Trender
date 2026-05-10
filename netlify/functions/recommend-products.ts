@@ -58,7 +58,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     const budget = extractBudget(typedAnalysis.designGoal) ?? undefined;
 
     // Initialize Supabase client with service role key (server-side only)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {

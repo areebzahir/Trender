@@ -11,7 +11,7 @@ export interface Product {
   productUrl: string;
   affiliateUrl: string;
   imageUrl: string;
-  /** Cleaned/processed image URL suitable for display (no watermarks, cropped) */
+  /** Cleaned/processed image URL suitable for display */
   cleanImageUrl: string;
   /** e.g. ["cream", "walnut", "white"] */
   colorTags: string[];
@@ -21,10 +21,10 @@ export interface Product {
   materialTags: string[];
   /** e.g. ["living room", "bedroom"] */
   roomTags: string[];
-  dimensions: {
-    width: string;
-    height: string;
-    depth: string;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    depth?: string;
   };
   inStock: boolean;
 }
