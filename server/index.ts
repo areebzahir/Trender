@@ -16,6 +16,15 @@ import { createClient } from '@supabase/supabase-js';
 import type { RoomAnalysis } from '../src/types/roomAnalysis';
 import { ROOM_ANALYSIS_REQUIRED_FIELDS } from '../src/types/roomAnalysis';
 import type { Product } from '../src/types/product';
+// New Gemini intelligence pipeline
+import { runRoomOverlayPipeline } from '../src/lib/room-overlay/roomOverlayPipeline';
+import { translateUserPrompt } from '../src/lib/gemini/translateUserPrompt';
+import { analyzeRoomWithGemini } from '../src/lib/gemini/analyzeRoomWithGemini';
+import { buildProductCandidates } from '../src/lib/room-overlay/productCandidateBuilder';
+import { scoreAndRankCandidates } from '../src/lib/room-overlay/productRecommendationService';
+import { rankProductsWithGemini } from '../src/lib/gemini/rankProductsWithGemini';
+import { toUserMessage } from '../src/lib/gemini/geminiErrors';
+import type { UserRoomPromptInput, RoomAnalysis as OverlayRoomAnalysis } from '../src/lib/room-overlay/types';
 
 const PORT = 8888;
 
@@ -171,6 +180,132 @@ async function handleSaveDesign(body: Record<string, unknown>, res: ServerRespon
   send(res, 200, { id: session.id, createdAt: session.createdAt });
 }
 
+// ── New Gemini pipeline handlers ──────────────────────────────────────────────
+
+async function handleOverlayAnalyze(body: Record<string, unknown>, res: ServerResponse) {
+  const { imageBase64, mimeType, prompt, budget, preferredStyle, preferredColor, furnitureType } = body;
+  if (!imageBase64 || typeof imageBase64 !== 'string') return send(res, 400, { error: 'imageBase64 is required.' });
+  if (!prompt || typeof prompt !== 'string') return send(res, 400, { error: 'prompt is required.' });
+  try {
+    const userPrompt   = await translateUserPrompt(prompt);
+    const roomAnalysis = await analyzeRoomWithGemini(
+      imageBase64, (mimeType as string) || 'image/jpeg', userPrompt,
+      { budget: typeof budget === 'number' ? budget : undefined }
+    );
+    send(res, 200, { userPrompt, roomAnalysis });
+  } catch (err) {
+    console.error('[overlay-analyze]', err);
+    send(res, 500, { error: toUserMessage(err) });
+  }
+}
+
+async function handleOverlayRecommend(body: Record<string, unknown>, res: ServerResponse) {
+  const { userPrompt, roomAnalysis, budget } = body;
+  if (!userPrompt || !roomAnalysis) return send(res, 400, { error: 'userPrompt and roomAnalysis are required.' });
+  try {
+    const budgetNum = typeof budget === 'number' ? budget : undefined;
+    const raw = await buildProductCandidates(roomAnalysis as OverlayRoomAnalysis, budgetNum);
+    const scored = scoreAndRankCandidates(raw, roomAnalysis as OverlayRoomAnalysis, userPrompt as UserRoomPromptInput, budgetNum);
+    let final = scored;
+    try {
+      const ranking = await rankProductsWithGemini(userPrompt as UserRoomPromptInput, roomAnalysis as OverlayRoomAnalysis, scored);
+      const map = new Map(ranking.rankedProducts.map(r => [r.productId, r]));
+      final = scored.map(c => {
+        const g = map.get(c.id);
+        if (!g) return c;
+        return { ...c, geminiScore: g.geminiScore, finalScore: c.structuredScore * 0.4 + g.geminiScore * 0.6, whySelected: g.whySelected };
+      }).sort((a, b) => b.finalScore - a.finalScore);
+    } catch { /* non-fatal */ }
+    send(res, 200, { candidates: final });
+  } catch (err) {
+    console.error('[overlay-recommend]', err);
+    send(res, 500, { error: toUserMessage(err) });
+  }
+}
+
+async function handleOverlayCreate(body: Record<string, unknown>, res: ServerResponse) {
+  const { imageBase64, mimeType, prompt, budget, preferredStyle, preferredColor, furnitureType } = body;
+  if (!imageBase64 || typeof imageBase64 !== 'string') return send(res, 400, { error: 'imageBase64 is required.' });
+  if (!prompt || typeof prompt !== 'string') return send(res, 400, { error: 'prompt is required.' });
+  try {
+    const result = await runRoomOverlayPipeline({
+      imageBase64, mimeType: (mimeType as string) || 'image/jpeg', prompt,
+      budget: typeof budget === 'number' ? budget : undefined,
+    });
+    if (!result.ok) return send(res, 500, { error: result.userMessage });
+    const { data } = result;
+    send(res, 200, {
+      needsUserClarification: data.needsUserClarification,
+      clarificationQuestion:  data.clarificationQuestion,
+      roomAnalysis:    data.roomAnalysis,
+      userPrompt:      data.userPrompt,
+      selectedProduct: data.selectedProduct,
+      placement:       data.placement,
+      renderGuidance:  data.renderGuidance,
+      allCandidates:   data.allCandidates.slice(0, 10),
+    });
+  } catch (err) {
+    console.error('[overlay-create]', err);
+    send(res, 500, { error: toUserMessage(err) });
+  }
+}
+
+async function handleRemoveBg(body: Record<string, unknown>, res: ServerResponse) {
+  const { imageUrl } = body;
+  if (!imageUrl || typeof imageUrl !== 'string')
+    return send(res, 400, { error: 'imageUrl required' });
+  try {
+    const fetchRes = await fetch(imageUrl as string, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Trender)' },
+    });
+    if (!fetchRes.ok) throw new Error(`Fetch failed: ${fetchRes.status}`);
+
+    const contentType = fetchRes.headers.get('content-type') ?? 'image/jpeg';
+    const arrayBuffer = await fetchRes.arrayBuffer();
+    const inputBlob = new Blob([arrayBuffer], { type: contentType });
+
+    const { removeBackground } = await import('@imgly/background-removal-node');
+    const resultBlob = await (removeBackground as any)(inputBlob, {
+      model: 'medium',
+      output: { format: 'image/png', quality: 1.0 },
+    });
+
+    const resultBuf = Buffer.from(await resultBlob.arrayBuffer());
+
+    // ── Quality check ─────────────────────────────────────────────────────────
+    // Decode the PNG and count non-transparent pixels.
+    // If fewer than 12% of pixels survived, the model removed the furniture
+    // (happens when furniture color matches background). Fall back to original.
+    const { createCanvas, loadImage } = await import('canvas');
+    const img = await loadImage(resultBuf);
+    const cv = createCanvas(img.width, img.height);
+    const ctx = cv.getContext('2d');
+    ctx.drawImage(img as any, 0, 0);
+    const pixels = ctx.getImageData(0, 0, img.width, img.height).data;
+    let nonTransparent = 0;
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] > 10) nonTransparent++;
+    }
+    const totalPixels = img.width * img.height;
+    const ratio = nonTransparent / totalPixels;
+    console.log(`[remove-bg] Quality check: ${(ratio * 100).toFixed(1)}% pixels retained`);
+
+    if (ratio < 0.12) {
+      // Too much removed — return original image as data URL
+      console.warn('[remove-bg] Quality check failed, returning original image');
+      const originalBuf = Buffer.from(arrayBuffer);
+      const originalDataUrl = `data:${contentType};base64,${originalBuf.toString('base64')}`;
+      return send(res, 200, { dataUrl: originalDataUrl, usedFallback: true });
+    }
+
+    const dataUrl = `data:image/png;base64,${resultBuf.toString('base64')}`;
+    send(res, 200, { dataUrl, usedFallback: false });
+  } catch (err) {
+    console.error('[remove-bg]', err);
+    send(res, 500, { error: (err as Error).message });
+  }
+}
+
 // ── Server ────────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -178,10 +313,39 @@ const server = createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     return res.end();
+  }
+
+  const url = req.url ?? '';
+
+  // GET /.netlify/functions/image-proxy?url=<encoded>
+  if (req.method === 'GET' && url.startsWith('/.netlify/functions/image-proxy')) {
+    try {
+      const u = new URL(url, 'http://localhost');
+      const target = u.searchParams.get('url');
+      if (!target) { res.writeHead(400); return res.end('url required'); }
+
+      const upstream = await fetch(target, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Trender image proxy)' },
+      });
+      if (!upstream.ok) { res.writeHead(upstream.status); return res.end(`upstream ${upstream.status}`); }
+
+      const contentType = upstream.headers.get('content-type') ?? 'image/jpeg';
+      const buf = Buffer.from(await upstream.arrayBuffer());
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(buf);
+    } catch (err) {
+      res.writeHead(500);
+      res.end(`proxy error: ${(err as Error).message}`);
+    }
+    return;
   }
 
   if (req.method !== 'POST') {
@@ -189,8 +353,7 @@ const server = createServer(async (req, res) => {
   }
 
   // Map /.netlify/functions/<name> paths (Vite proxy rewrites /api/* to this)
-  const url = req.url ?? '';
-  const route = url.replace(/^\/\.netlify\/functions\//, '');
+  const route = url.replace(/^\/\.netlify\/functions\//, '').split('?')[0];
 
   try {
     const body = await readBody(req);
@@ -199,6 +362,14 @@ const server = createServer(async (req, res) => {
     if (route === 'recommend-products')  return await handleRecommendProducts(body, res);
     if (route === 'generate-room-preview') return await handleGeneratePreview(body, res);
     if (route === 'save-design')         return await handleSaveDesign(body, res);
+
+    // New Gemini intelligence pipeline routes
+    if (route === 'room-overlay-analyze')    return await handleOverlayAnalyze(body, res);
+    if (route === 'room-overlay-recommend')  return await handleOverlayRecommend(body, res);
+    if (route === 'room-overlay-create')     return await handleOverlayCreate(body, res);
+
+    // Background removal
+    if (route === 'remove-bg') return await handleRemoveBg(body, res);
 
     send(res, 404, { error: `Unknown route: ${route}` });
   } catch (err) {
@@ -214,6 +385,9 @@ server.listen(PORT, () => {
   console.log('   POST /.netlify/functions/recommend-products');
   console.log('   POST /.netlify/functions/generate-room-preview');
   console.log('   POST /.netlify/functions/save-design');
+  console.log('   POST /.netlify/functions/room-overlay-analyze');
+  console.log('   POST /.netlify/functions/room-overlay-recommend');
+  console.log('   POST /.netlify/functions/room-overlay-create');
   console.log('\n   Vite proxy: /api/* → http://localhost:8888/.netlify/functions/*');
   console.log('\n   Make sure GEMINI_API_KEY is set in .env\n');
 });

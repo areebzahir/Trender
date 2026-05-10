@@ -182,36 +182,68 @@ export const RoomUploadPage = ({ onAnalysisComplete, onBack }: RoomUploadPagePro
         reader.readAsDataURL(imageFile!);
       });
 
-      // 2. Analyze room
-      const analyzeRes = await fetch('/api/analyze-room', {
+      const mimeType = imageFile!.type || 'image/jpeg';
+
+      // 2. Run full Gemini intelligence pipeline
+      const overlayRes = await fetch('/api/room-overlay-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, prompt }),
+        body: JSON.stringify({ imageBase64: base64, mimeType, prompt }),
       });
-      if (!analyzeRes.ok) {
-        const err = await analyzeRes.json().catch(() => ({ error: 'Analysis failed.' }));
+      if (!overlayRes.ok) {
+        const err = await overlayRes.json().catch(() => ({ error: 'Analysis failed.' }));
         throw new Error(err.error ?? 'Room analysis failed. Please try again.');
       }
-      const { analysis } = await analyzeRes.json();
+      const overlayData = await overlayRes.json();
 
-      // 3. Recommend products
-      const productsRes = await fetch('/api/recommend-products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysis }),
-      });
-      const productsData = productsRes.ok
-        ? await productsRes.json()
-        : { products: [] };
+      if (overlayData.needsUserClarification) {
+        throw new Error(overlayData.clarificationQuestion ?? 'Please upload a clear photo of the room you want to redesign.');
+      }
 
-      // 4. Generate room preview (non-blocking — failure is graceful)
+      const { roomAnalysis, allCandidates, renderGuidance } = overlayData;
+
+      // 3. Map overlay RoomAnalysis → shape expected by AIResultsPage
+      const analysis = {
+        roomType:              roomAnalysis?.roomType ?? 'room',
+        currentStyle:          (roomAnalysis?.designStyleDetected ?? []).join(', ') || 'modern',
+        detectedColors:        roomAnalysis?.dominantColors ?? [],
+        recommendedPalette:    [
+          ...(roomAnalysis?.colorPalette?.walls ?? []),
+          ...(roomAnalysis?.colorPalette?.accents ?? []),
+        ],
+        designGoal:            roomAnalysis?.requestedItem?.placementGoal ?? prompt,
+        missingItems:          [roomAnalysis?.requestedItem?.furnitureType].filter(Boolean) as string[],
+        recommendedCategories: [roomAnalysis?.requestedItem?.category].filter(Boolean) as string[],
+        reasoning: [
+          renderGuidance?.placementNotes?.[0],
+          renderGuidance?.scaleNotes?.[0],
+        ].filter(Boolean).join(' ') || 'Based on your room, we found matching furniture for your request.',
+      };
+
+      // 4. Map ProductCandidates → Product shape for ProductCard
+      const products = (allCandidates ?? []).slice(0, 12).map((c: any) => ({
+        id:            c.id,
+        name:          c.title,
+        storeName:     c.storeName ?? 'Store',
+        category:      c.category ?? 'furniture',
+        price:         c.price ?? 0,
+        currency:      c.currency ?? 'CAD',
+        productUrl:    c.productUrl ?? '',
+        affiliateUrl:  c.productUrl ?? '',
+        imageUrl:      c.imageUrl ?? '/placeholder.svg',
+        cleanImageUrl: c.imageUrl ?? '/placeholder.svg',
+        colorTags:     c.colors ?? [],
+        styleTags:     c.styleTags ?? [],
+        materialTags:  c.materials ?? [],
+        roomTags:      c.roomType ? [c.roomType] : [],
+        inStock:       true,
+      }));
+
+      // 5. Generate room preview (non-blocking)
       let previewUrl: string | null = null;
       let isFallbackPreview = true;
       try {
-        const productImageUrls = (productsData.products ?? [])
-          .slice(0, 3)
-          .map((p: { imageUrl: string }) => p.imageUrl);
-
+        const productImageUrls = products.slice(0, 3).map((p: any) => p.imageUrl);
         const previewRes = await fetch('/api/generate-room-preview', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -226,8 +258,7 @@ export const RoomUploadPage = ({ onAnalysisComplete, onBack }: RoomUploadPagePro
         // Preview failure is non-fatal
       }
 
-      // 5. Store image and save session
-      let imageUrl = imagePreview ?? '';
+      // 6. Save session (non-blocking)
       let sessionId = '';
       try {
         const saveRes = await fetch('/api/save-design', {
@@ -236,27 +267,27 @@ export const RoomUploadPage = ({ onAnalysisComplete, onBack }: RoomUploadPagePro
           body: JSON.stringify({
             imageUrl: imagePreview ?? '',
             analysis,
-            selectedProductIds: (productsData.products ?? []).map((p: { id: string }) => p.id),
+            selectedProductIds: products.map((p: any) => p.id),
             previewImageUrl: previewUrl,
           }),
         });
-        if (saveRes.ok) {
-          const saveData = await saveRes.json();
-          sessionId = saveData.id ?? '';
-        }
+        if (saveRes.ok) sessionId = (await saveRes.json()).id ?? '';
       } catch {
         // Save failure is non-fatal
       }
 
       onAnalysisComplete({
         imageBase64: base64,
-        imageUrl,
+        imageUrl: imagePreview ?? '',
         analysis,
-        products: productsData.products ?? [],
+        products,
         previewUrl,
         isFallbackPreview,
         sessionId,
-      });
+        // Pass raw candidates and placement for the swipe compositor
+        candidates: overlayData.allCandidates ?? [],
+        placement: overlayData.placement ?? null,
+      } as any);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       // Never show stack traces

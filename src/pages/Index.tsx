@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
 import { ChoicePage } from "@/components/ChoicePage";
-import { RoomUpload } from "@/components/RoomUpload";
 import { RoomUploadPage } from "@/components/RoomUploadPage";
-import { AIResultsPage } from "@/components/AIResultsPage";
+import SwipeResultsPage from "@/components/SwipeResultsPage";
 import TrenderSwipeScreen from "@/components/TrenderSwipeScreen";
 import { StyleQuiz } from "@/components/StyleQuiz";
 import { StyleResults } from "@/components/StyleResults";
 import { EnhancedSwipeInterface } from "@/components/EnhancedSwipeInterface";
 import type { AIAnalysisResult } from "@/types/api";
+import type { ProductCandidate, PlacementRecommendation } from "@/lib/room-overlay/types";
 
 type AppState =
   | 'landing'
@@ -18,7 +18,7 @@ type AppState =
   | 'results'
   | 'swipe'
   | 'enhanced-swipe'
-  | 'ai-results'; // NEW — AI personalization results page
+  | 'swipe-results'; // AI-powered swipe results with stitched images
 
 interface RoomData {
   image: File | null;
@@ -27,17 +27,21 @@ interface RoomData {
   quizResults?: Record<string, string>;
 }
 
+// Holds everything needed for the swipe results page
+interface SwipeResultsData {
+  imageBase64: string;
+  candidates: ProductCandidate[];
+  placement: PlacementRecommendation | null;
+  roomType: string;
+  designGoal: string;
+}
+
 const Index = () => {
   const [currentState, setCurrentState] = useState<AppState>('landing');
   const [roomData, setRoomData] = useState<RoomData | null>(null);
-  // NEW — holds the full AI analysis result for the ai-results page
-  const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
+  const [swipeData, setSwipeData] = useState<SwipeResultsData | null>(null);
 
-  // ── Existing handlers (unchanged) ─────────────────────────────────────────
-
-  const handleGetStarted = () => {
-    setCurrentState('choice');
-  };
+  const handleGetStarted = () => setCurrentState('choice');
 
   const handleRoomUpload = (data: RoomData) => {
     setRoomData(data);
@@ -45,90 +49,75 @@ const Index = () => {
   };
 
   const handleQuizComplete = (results: Record<string, string>) => {
-    console.log('Quiz completed with results:', results);
-    setRoomData(prev => {
-      const newData = prev
-        ? { ...prev, quizResults: results }
-        : { image: null, preferences: '', quizResults: results };
-      console.log('Setting roomData:', newData);
-      return newData;
-    });
+    setRoomData(prev =>
+      prev ? { ...prev, quizResults: results }
+           : { image: null, preferences: '', quizResults: results }
+    );
     setCurrentState('results');
   };
 
-  const handleResultsContinue = () => {
-    setCurrentState('swipe');
-  };
-
-  const handleUploadFromResults = () => {
-    setCurrentState('upload');
-  };
-
-  const handleBackToLanding = () => {
-    setCurrentState('landing');
-    setRoomData(null);
-  };
-
-  const handleBackToUpload = () => {
-    setCurrentState('upload');
-  };
-
-  const handleBackToQuiz = () => {
-    setCurrentState('quiz');
-  };
-
-  const handleRoomDecorating = () => {
-    setCurrentState('upload');
-  };
-
+  const handleResultsContinue = () => setCurrentState('swipe');
+  const handleUploadFromResults = () => setCurrentState('upload');
+  const handleBackToLanding = () => { setCurrentState('landing'); setRoomData(null); };
+  const handleRoomDecorating = () => setCurrentState('upload');
   const handleStyleQuiz = () => {
-    setRoomData({
-      image: null,
-      preferences: '',
-      quizResults: {}
-    });
+    setRoomData({ image: null, preferences: '', quizResults: {} });
     setCurrentState('quiz');
   };
-
-  const handleBackToChoice = () => {
-    setCurrentState('choice');
-  };
-
-  const handleGoToEnhancedSwipe = () => {
-    setCurrentState('enhanced-swipe');
-  };
-
-  const handleBackToSwipe = () => {
-    setCurrentState('swipe');
-  };
-
-  // ── NEW handlers for AI personalization flow ───────────────────────────────
+  const handleBackToChoice = () => setCurrentState('choice');
+  const handleGoToEnhancedSwipe = () => setCurrentState('enhanced-swipe');
+  const handleBackToSwipe = () => setCurrentState('swipe');
 
   /** Called by RoomUploadPage when the full AI pipeline completes. */
-  const handleAIAnalysisComplete = (result: AIAnalysisResult) => {
-    setAiResult(result);
-    setCurrentState('ai-results');
+  const handleAIAnalysisComplete = (result: AIAnalysisResult & {
+    candidates?: ProductCandidate[];
+    placement?: PlacementRecommendation | null;
+  }) => {
+    setSwipeData({
+      imageBase64: result.imageBase64,
+      candidates: result.candidates ?? result.products.map(p => ({
+        id: p.id,
+        title: p.name,
+        storeName: p.storeName,
+        price: p.price,
+        currency: p.currency,
+        productUrl: p.productUrl,
+        imageUrl: p.imageUrl,
+        imageUrls: [p.imageUrl],
+        category: p.category,
+        furnitureType: p.category,
+        roomType: p.roomTags?.[0] ?? null,
+        colors: p.colorTags,
+        materials: p.materialTags,
+        styleTags: p.styleTags,
+        aestheticTags: [],
+        widthCm: null,
+        heightCm: null,
+        depthCm: null,
+        structuredScore: 0,
+        finalScore: 0,
+        whySelected: '',
+        renderWarnings: [],
+      })),
+      placement: result.placement ?? null,
+      roomType: result.analysis.roomType,
+      designGoal: result.analysis.designGoal,
+    });
+    setCurrentState('swipe-results');
   };
 
-  /** "Back" from AI results → return to upload page. */
-  const handleBackFromAIResults = () => {
-    setCurrentState('upload');
-  };
-
-  /** "Start Over" from AI results → clear state and return to landing. */
   const handleStartOver = () => {
-    setAiResult(null);
+    setSwipeData(null);
     setRoomData(null);
     setCurrentState('landing');
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
-  if (currentState === 'landing') {
+  if (currentState === 'landing')
     return <LandingPage onGetStarted={handleGetStarted} />;
-  }
 
-  if (currentState === 'choice') {
+  if (currentState === 'choice')
     return (
       <ChoicePage
         onBack={handleBackToLanding}
@@ -136,49 +125,47 @@ const Index = () => {
         onStyleQuiz={handleStyleQuiz}
       />
     );
-  }
 
-  if (currentState === 'upload') {
-    // Use the new AI-powered RoomUploadPage
+  if (currentState === 'upload')
     return (
       <RoomUploadPage
         onAnalysisComplete={handleAIAnalysisComplete}
         onBack={handleBackToChoice}
       />
     );
-  }
 
-  if (currentState === 'ai-results' && aiResult) {
+  if (currentState === 'swipe-results' && swipeData)
     return (
-      <AIResultsPage
-        result={aiResult}
-        onBack={handleBackFromAIResults}
+      <SwipeResultsPage
+        roomImageBase64={swipeData.imageBase64}
+        candidates={swipeData.candidates}
+        placement={swipeData.placement}
+        roomType={swipeData.roomType}
+        designGoal={swipeData.designGoal}
+        onBack={() => setCurrentState('upload')}
         onStartOver={handleStartOver}
       />
     );
-  }
 
-  if (currentState === 'quiz') {
+  if (currentState === 'quiz')
     return (
       <StyleQuiz
         onComplete={handleQuizComplete}
         onBack={handleBackToChoice}
       />
     );
-  }
 
-  if (currentState === 'results' && roomData?.quizResults) {
+  if (currentState === 'results' && roomData?.quizResults)
     return (
       <StyleResults
         results={roomData.quizResults}
-        onBack={handleBackToQuiz}
+        onBack={() => setCurrentState('quiz')}
         onContinue={handleResultsContinue}
         onUploadRoom={handleUploadFromResults}
       />
     );
-  }
 
-  if (currentState === 'swipe') {
+  if (currentState === 'swipe')
     return (
       <TrenderSwipeScreen
         onBack={handleBackToChoice}
@@ -186,16 +173,14 @@ const Index = () => {
         roomData={roomData}
       />
     );
-  }
 
-  if (currentState === 'enhanced-swipe' && roomData) {
+  if (currentState === 'enhanced-swipe' && roomData)
     return (
       <EnhancedSwipeInterface
         onBack={handleBackToSwipe}
         roomData={roomData}
       />
     );
-  }
 
   return <LandingPage onGetStarted={handleGetStarted} />;
 };
